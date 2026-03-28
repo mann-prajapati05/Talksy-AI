@@ -20,14 +20,13 @@ export const login = async(req,res,next) =>{
             _id:user._id,
             name:user.name,
             email:user.email,
-            gender:user.gender
         }
-        const token=await jwt.sign(payload,process.env.JWT_SECRET);
+        const token=await jwt.sign(payload,process.env.JWT_SECRET , {expiresIn:"2d"});
         
         res.cookie("userToken",token,{
             httpOnly:true,
             secure:process.env.NODE_ENV==='prod',
-            maxAge:3600000,
+            maxAge:2*24*3600000,
             sameSite:'strict'
         });
         console.log(token);
@@ -38,7 +37,7 @@ export const login = async(req,res,next) =>{
 
     }catch(err){
         console.log("Error while login user.." ,err);
-        return res.status(400).json({
+        return res.status(500).json({
             success:false,
             message:"login failed..",
             err
@@ -109,14 +108,13 @@ export const signup=[
                 _id:user._id,
                 name:user.name,
                 email:user.email,
-                gender:user.gender
             }
-            const token=jwt.sign(payload,process.env.JWT_SECRET);
+            const token=jwt.sign(payload,process.env.JWT_SECRET , {expiresIn:"2d"});
 
             res.cookie("userToken",token,{
                 httpOnly:true,
                 secure:process.env.NODE_ENV==='prod',
-                maxAge:3600000,
+                maxAge:2*24*3600000,
                 sameSite:'strict'
             });
             console.log(token);
@@ -126,7 +124,7 @@ export const signup=[
             })
     }catch(err){
         console.log("Error while user signup..",err);
-        return res.status(400).json({
+        return res.status(500).json({
             success:false,
             message:"sign failed..",
             err
@@ -134,3 +132,64 @@ export const signup=[
     }
 }
 ]
+
+export const googleAuth = async(req,res,next) =>{
+
+    try{
+
+        const {name , email}= req.body;
+        let user= await User.findOne({email});
+
+    if(!user){
+        user = new User({name , email});
+        await user.save();
+    }
+
+    const payload={
+        _id:user._id,
+        name:user.name,
+        email:user.email
+    }
+
+    const token= jwt.sign(payload,process.env.JWT_SECRET, {expiresIn:"2d"});
+
+    res.cookie("userToken" ,token,{
+        httpOnly:true,
+        secure:process.env.NODE_ENV==='prod',
+        maxAge:2*24*3600000,
+        sameSite:'strict'
+    });
+    
+    console.log(token);
+    console.log(user);
+    return res.status(201).json({
+        success:true,
+        message:"Google sign successfully.."
+    })
+
+    }catch(err){
+        console.log("Error while continue with google..",err);
+        return res.status(500).json({
+            success:false,
+            message:"google sign failed..",
+            err
+        });
+    }
+}
+
+export const logout = async(req,res,next)=>{
+    try{
+        await res.clearCookie("userToken");
+        return res.status(200).json({
+            success:true,
+            message:"logout successful..",
+        })
+    }catch(err){
+        console.log("Error while logout..",err);
+        return res.status(500).json({
+            success:false,
+            message:"logout failed..",
+            err
+        });
+    }
+}

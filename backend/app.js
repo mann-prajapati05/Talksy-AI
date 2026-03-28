@@ -1,10 +1,10 @@
 import dotenv from 'dotenv';
 import express from 'express';
-import mongoose, { connect } from 'mongoose';
 import ConnectDB from './config/connectDB.js';
 import authRouter from './routes/authRouter.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import userRouter from './routes/userRouter.js';
 
 dotenv.config();
 const app=express();
@@ -22,10 +22,20 @@ app.use('/',(req,res,next)=>{
 })
 
 app.use('/auth', authRouter);
+app.use('/users', userRouter); 
 
 const PORT=process.env.PORT;
 
-app.listen(PORT,()=>{
-    console.log(`Server is running on http://localhost:${PORT}/`);
-    ConnectDB();
-})
+const startServer = async () => {
+    try {
+        await ConnectDB();
+        app.listen(PORT,()=>{
+            console.log(`Server is running on http://localhost:${PORT}/`);
+        });
+    } catch (err) {
+        console.log("Failed to start server due to DB connection error..", err);
+        process.exit(1);
+    }
+};
+
+startServer();

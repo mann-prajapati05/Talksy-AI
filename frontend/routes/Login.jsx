@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../src/utils/firebase";
 axios.defaults.withCredentials = true;
 
 const Login = () => {
@@ -55,6 +57,22 @@ const Login = () => {
     navigate("/");
     setEmail("");
     setPassword("");
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      console.log(result);
+
+      await axios.post("http://localhost:8010/auth/google", {
+        name: result.user.displayName,
+        email: result.user.email,
+      });
+
+      navigate("/");
+    } catch (err) {
+      console.log("error while google login : ", err);
+    }
   };
 
   return (
@@ -215,6 +233,32 @@ const Login = () => {
               <span className="px-2 bg-slate-900/30 text-slate-500">or</span>
             </div>
           </div>
+
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            className="flex w-full items-center justify-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-3 text-sm font-medium text-slate-100 transition-all duration-300 hover:-translate-y-px hover:border-cyan-300/45 hover:bg-white/10"
+          >
+            <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill="#EA4335"
+                d="M12 10.2v3.92h5.45c-.24 1.26-.95 2.33-2.01 3.05l3.25 2.52c1.89-1.74 2.98-4.29 2.98-7.31 0-.72-.06-1.41-.19-2.09H12z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 22c2.7 0 4.96-.9 6.61-2.44l-3.25-2.52c-.9.6-2.05.96-3.36.96-2.58 0-4.77-1.74-5.55-4.08H3.1v2.57A9.99 9.99 0 0012 22z"
+              />
+              <path
+                fill="#4A90E2"
+                d="M6.45 13.92A5.98 5.98 0 016.12 12c0-.67.12-1.31.33-1.92V7.51H3.1A9.99 9.99 0 002 12c0 1.61.39 3.13 1.1 4.49l3.35-2.57z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M12 5.95c1.47 0 2.79.5 3.83 1.49l2.87-2.87C16.95 2.94 14.69 2 12 2A9.99 9.99 0 003.1 7.51l3.35 2.57C7.23 7.74 9.42 5.95 12 5.95z"
+              />
+            </svg>
+            Continue with Google
+          </button>
 
           {/* Signup Link Section */}
           <div className="text-center">
