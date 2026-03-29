@@ -2,6 +2,31 @@ import fs from 'fs';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { askAi } from '../services/openRouter.service.js';
 
+const parseAiJson = (rawResponse) => {
+    if (!rawResponse || typeof rawResponse !== 'string') {
+        throw new Error('AI returned invalid response format');
+    }
+
+    const cleaned = rawResponse
+        .replace(/```json\s*/gi, '')
+        .replace(/```/g, '')
+        .trim();
+
+    try {
+        return JSON.parse(cleaned);
+    } catch {
+        const start = cleaned.indexOf('{');
+        const end = cleaned.lastIndexOf('}');
+
+        if (start === -1 || end === -1 || start >= end) {
+            throw new Error('Could not extract valid JSON from AI response');
+        }
+
+        const jsonSlice = cleaned.slice(start, end + 1);
+        return JSON.parse(jsonSlice);
+    }
+};
+
 export const analyzeResume= async(req,res) =>{
     try{
         if(!req.file){
@@ -38,7 +63,8 @@ export const analyzeResume= async(req,res) =>{
                 role:"system",
                 content:`
                 Extract structured data from resume.
-                Return strictly JSON:
+                Return strictly valid JSON only.
+                Do not include markdown, code fences, or explanations.
                 {
                     "role":"string",
                     "experience":"string",
@@ -54,15 +80,15 @@ export const analyzeResume= async(req,res) =>{
         ];
 
         const aiResponse = await askAi(messages);
-        const parsed= JSON.parse(aiResponse);
+        const parsed= parseAiJson(aiResponse);
 
         fs.unlinkSync(filepath);
 
         res.json({
-            role:parsed.role,
-            experience:parsed.experience,
-            projects:parsed.projects,
-            skills:parsed.skills,
+            role:parsed.role || '',
+            experience:parsed.experience || '',
+            projects:Array.isArray(parsed.projects) ? parsed.projects : [],
+            skills:Array.isArray(parsed.skills) ? parsed.skills : [],
             resumeText
         });
     }catch(err){
