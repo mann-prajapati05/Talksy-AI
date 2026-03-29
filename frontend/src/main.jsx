@@ -7,6 +7,8 @@ import Signup from "../routes/Signup.jsx";
 import Home from "../routes/Home.jsx";
 import store from "./redux/store.js";
 import { Provider } from "react-redux";
+import SpeakLab from "../routes/SpeakLab.jsx";
+import MockHire from "../routes/MockHire.jsx";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +26,14 @@ const router = createBrowserRouter([
       {
         path: "/signup",
         element: <Signup />,
+      },
+      {
+        path: "/speak-lab",
+        element: <SpeakLab />,
+      },
+      {
+        path: "/mock-hire",
+        element: <MockHire />,
       },
     ],
   },
