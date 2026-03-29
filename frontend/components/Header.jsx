@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-function Header() {
+function Header({ onProfileClick }) {
+  const userData = useSelector((state) => state.user.userData);
+  const userName = userData?.name?.trim() || "";
+  const profileInitial = userName ? userName.charAt(0).toUpperCase() : "P";
+
   return (
     <header className="relative mx-5 mb-5 grid grid-cols-1 items-center gap-4 overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 shadow-[0_18px_45px_rgba(15,23,42,0.35)] backdrop-blur-xl md:grid-cols-[auto_1fr_auto] md:gap-4">
       <div
@@ -46,10 +51,13 @@ function Header() {
           </button>
         </Link>
         <button
-          className="rounded-full bg-linear-to-r from-indigo-600 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-[0_10px_25px_rgba(99,102,241,0.35)] transition-all duration-300 hover:-translate-y-px hover:shadow-[0_14px_28px_rgba(34,211,238,0.28)]"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-cyan-300/40 bg-linear-to-br from-indigo-600 to-violet-600 text-base font-semibold text-white shadow-[0_10px_25px_rgba(99,102,241,0.35)] transition-all duration-300 hover:-translate-y-px hover:shadow-[0_14px_28px_rgba(34,211,238,0.28)]"
           type="button"
+          onClick={onProfileClick}
+          aria-label="Profile"
+          title={userName || "Profile"}
         >
-          Profile
+          {profileInitial}
         </button>
       </div>
     </header>

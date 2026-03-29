@@ -75,15 +75,17 @@ export default function Signup() {
     });
 
     try {
-      await axios.post("http://localhost:8010/auth/signup", {
+      const res = await axios.post("http://localhost:8010/auth/signup", {
         name: formData.fullName,
         gender: formData.gender,
         email: formData.email,
         password: formData.password,
         confirmPassword: formData.confirmPassword,
       });
+      dispatch(setUserData(res.data.user));
     } catch (err) {
       console.log("Error while creating new account..", err);
+      dispatch(setUserData(null));
     }
     navigate("/");
     setFormData({

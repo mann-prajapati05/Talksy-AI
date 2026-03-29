@@ -32,7 +32,12 @@ export const login = async(req,res,next) =>{
         console.log(token);
         return res.status(200).json({
             success:true,
-            message:"Login successfully.."
+            message:"Login successfully..",
+            user:{
+                    name:user.name,
+                    email:user.email,
+                    gender:user.gender,
+            }
         })
 
     }catch(err){
@@ -120,7 +125,12 @@ export const signup=[
             console.log(token);
             return res.status(201).json({
                 success:true,
-                message:"sign successfully.."
+                message:"sign successfully..",
+                user:{
+                    name:user.name,
+                    email:user.email,
+                    gender:user.gender,
+                }
             })
     }catch(err){
         console.log("Error while user signup..",err);
@@ -164,7 +174,12 @@ export const googleAuth = async(req,res,next) =>{
     console.log(user);
     return res.status(201).json({
         success:true,
-        message:"Google sign successfully.."
+        message:"Google sign successfully..",
+        user:{
+            name:user.name,
+            email:user.email,
+            gender:"",
+        }
     })
 
     }catch(err){

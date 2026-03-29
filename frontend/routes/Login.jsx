@@ -3,9 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../src/utils/firebase";
+import { useDispatch } from "react-redux";
+import { setUserData } from "../src/redux/userSlice";
 axios.defaults.withCredentials = true;
 
 const Login = () => {
+  const dispatch = useDispatch();
+
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -50,9 +54,14 @@ const Login = () => {
 
     console.log("Login attempt:", { email, password });
     try {
-      await axios.post("http://localhost:8010/auth/login", { email, password });
+      const res = await axios.post("http://localhost:8010/auth/login", {
+        email,
+        password,
+      });
+      dispatch(setUserData(res.data.user));
     } catch (err) {
       console.log("error while login : ", err);
+      dispatch(setUserData(null));
     }
     navigate("/");
     setEmail("");
@@ -64,14 +73,16 @@ const Login = () => {
       const result = await signInWithPopup(auth, provider);
       console.log(result);
 
-      await axios.post("http://localhost:8010/auth/google", {
+      const res = await axios.post("http://localhost:8010/auth/google", {
         name: result.user.displayName,
         email: result.user.email,
       });
+      dispatch(setUserData(res.data.user));
 
       navigate("/");
     } catch (err) {
       console.log("error while google login : ", err);
+      dispatch(setUserData(null));
     }
   };
 
