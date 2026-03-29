@@ -5,6 +5,7 @@ import authRouter from './routes/authRouter.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import userRouter from './routes/userRouter.js';
+import interviewRouter from './routes/interviewRouter.js';
 
 dotenv.config();
 const app=express();
@@ -23,6 +24,7 @@ app.use('/',(req,res,next)=>{
 
 app.use('/auth', authRouter);
 app.use('/users', userRouter); 
+app.use('/interview', interviewRouter);
 
 const PORT=process.env.PORT;
 
