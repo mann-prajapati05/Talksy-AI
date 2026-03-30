@@ -8,6 +8,7 @@ function Header({ onProfileClick }) {
   const location = useLocation();
   const userData = useSelector((state) => state.user.userData);
   const userName = userData?.name?.trim() || "";
+  const userCredits = Number(userData?.credits ?? 0);
   const isLoggedIn = Boolean(userData);
 
   const profileInitial = useMemo(() => {
@@ -119,23 +120,32 @@ function Header({ onProfileClick }) {
             </Link>
           </>
         ) : (
-          <button
-            className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-cyan-300/40 bg-linear-to-br from-indigo-600 to-violet-600 text-base font-semibold text-white shadow-[0_10px_25px_rgba(99,102,241,0.35)] transition-all duration-300 hover:-translate-y-px hover:shadow-[0_14px_28px_rgba(34,211,238,0.28)]"
-            type="button"
-            onClick={onProfileClick}
-            aria-label="Profile"
-            title={userName || "Profile"}
-          >
-            {userData?.profilePicture ? (
-              <img
-                src={userData.profilePicture}
-                alt="Profile"
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              profileInitial
-            )}
-          </button>
+          <>
+            <div className="group inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-semibold text-cyan-200 shadow-[0_8px_20px_rgba(6,182,212,0.14)] backdrop-blur-md transition-all duration-300 hover:scale-[1.03] hover:border-cyan-300/35 hover:text-cyan-100 hover:shadow-[0_10px_26px_rgba(34,211,238,0.24)]">
+              <span className="text-sm leading-none text-cyan-300 transition-colors duration-300 group-hover:text-cyan-200">
+                ⚡
+              </span>
+              <span className="whitespace-nowrap">{userCredits} Credits</span>
+            </div>
+
+            <button
+              className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-cyan-300/40 bg-linear-to-br from-indigo-600 to-violet-600 text-base font-semibold text-white shadow-[0_10px_25px_rgba(99,102,241,0.35)] transition-all duration-300 hover:-translate-y-px hover:shadow-[0_14px_28px_rgba(34,211,238,0.28)]"
+              type="button"
+              onClick={onProfileClick}
+              aria-label="Profile"
+              title={userName || "Profile"}
+            >
+              {userData?.profilePicture ? (
+                <img
+                  src={userData.profilePicture}
+                  alt="Profile"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                profileInitial
+              )}
+            </button>
+          </>
         )}
       </div>
     </header>

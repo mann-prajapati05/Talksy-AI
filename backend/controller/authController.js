@@ -37,6 +37,7 @@ export const login = async(req,res,next) =>{
                     name:user.name,
                     email:user.email,
                     gender:user.gender,
+                    credits:user.credits,
             }
         })
 
@@ -130,6 +131,7 @@ export const signup=[
                     name:user.name,
                     email:user.email,
                     gender:user.gender,
+                    credits:user.credits,
                 }
             })
     }catch(err){
@@ -179,6 +181,7 @@ export const googleAuth = async(req,res,next) =>{
             name:user.name,
             email:user.email,
             gender:"",
+            credits:user.credits,
         }
     })
 

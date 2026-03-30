@@ -14,7 +14,8 @@ export const getCurrentUser = async(req,res)=>{
         return res.status(200).json({
             name:user.name,
             email:user.email,
-            gender:user.gender
+            gender:user.gender,
+            credits:user.credits,
         });
     }catch(err){
         return res.status(404).json({

@@ -31,6 +31,7 @@ const Profile = ({ isOpen = false, onClose = () => {} }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const userData = useSelector((state) => state.user.userData);
+  const userCredits = Number(userData?.credits ?? 0);
 
   const { initials, completion } = useMemo(() => {
     const rawName = userData?.name?.trim() || "";
@@ -157,6 +158,26 @@ const Profile = ({ isOpen = false, onClose = () => {} }) => {
                   </div>
 
                   <div className="my-5 h-px w-full bg-white/10"></div>
+
+                  {userData && (
+                    <article className="mb-5 rounded-xl border border-cyan-300/20 bg-white/5 p-4 shadow-[0_10px_30px_rgba(34,211,238,0.12)] backdrop-blur-md">
+                      <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-cyan-200/80">
+                        Available Credits
+                      </p>
+                      <p className="mt-2 text-3xl font-semibold leading-none text-cyan-200">
+                        {userCredits}
+                      </p>
+                      <p className="mt-2 text-xs text-slate-300">
+                        Use credits for interviews
+                      </p>
+                      <button
+                        type="button"
+                        className="mt-3 w-full rounded-lg border border-cyan-300/30 bg-cyan-400/10 px-3 py-2 text-xs font-semibold text-cyan-100 transition-all duration-300 hover:scale-[1.01] hover:border-cyan-200/50 hover:bg-cyan-400/15 hover:shadow-[0_12px_26px_rgba(34,211,238,0.2)]"
+                      >
+                        Buy Credits
+                      </button>
+                    </article>
+                  )}
 
                   <div className="grid grid-cols-2 gap-3">
                     <article className="rounded-xl border border-white/10 bg-white/5 p-3">
