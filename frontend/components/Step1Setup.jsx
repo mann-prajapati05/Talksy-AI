@@ -127,11 +127,9 @@ function Step1Setup({ onStart }) {
       role: role.trim(),
       experience,
       mode,
-      resumeFile,
       projects,
       skills,
       resumeText,
-      analysisDone,
     });
   };
 
