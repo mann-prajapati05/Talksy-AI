@@ -1,7 +1,9 @@
 import React from "react";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
+import { setUserData } from "../src/redux/userSlice";
 
 const EXPERIENCE_OPTIONS = ["Fresher", "1-3 years", "3+ years"];
 const INTERVIEW_MODES = ["Technical", "HR", "Mixed"];
@@ -59,6 +61,9 @@ function OptionButton({ active, label, onClick }) {
 }
 
 function Step1Setup({ onStart }) {
+  const { userData } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
   const [role, setRole] = useState("");
   const [experience, setExperience] = useState("");
   const [mode, setMode] = useState("Technical");
@@ -119,18 +124,36 @@ function Step1Setup({ onStart }) {
   const canStart =
     Boolean(role.trim()) && Boolean(experience.trim()) && !analyzing;
 
-  const handleStartInterview = () => {
+  const handleStartInterview = async () => {
     if (!canStart || loading) return;
     setLoading(true);
 
-    onStart({
-      role: role.trim(),
-      experience,
-      mode,
-      projects,
-      skills,
-      resumeText,
-    });
+    try {
+      const result = await axios.post(
+        "http://localhost:8010/interview/generate-questions",
+        {
+          role: role.trim(),
+          experience,
+          mode,
+          projects,
+          skills,
+          resumeText,
+        },
+        {
+          withCredentials: true,
+        },
+      );
+      console.log(result.data);
+
+      if (userData) {
+        dispatch(setUserData({ ...user, credits: result.data.creditsLeft }));
+      }
+      setLoading(false);
+      onStart(result.data);
+    } catch (err) {
+      console.log("Error while Start Interview..", err);
+      setLoading(false);
+    }
   };
 
   return (

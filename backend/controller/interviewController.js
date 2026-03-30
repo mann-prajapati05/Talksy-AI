@@ -170,7 +170,7 @@ export const analyzeResume= async(req,res) =>{
 
 export const generateQuestions= async(req,res)=>{
     try{
-        const {role,experience,mode,projects,skills,resumeText}=req.boody;
+        let {role,experience,mode,projects,skills,resumeText}=req.boody;
         role=role?.trim();
         experience=experience?.trim();
         mode=mode?.trim();
@@ -362,7 +362,7 @@ export const generateQuestions= async(req,res)=>{
             question:q.question,
             difficulty:q.difficulty,
             questionType:q.type,
-            timeLimit:difficultyTimeMap[q.difficulty] || 60;
+            timeLimit:difficultyTimeMap[q.difficulty] || 60
         }))
         });
 
@@ -382,11 +382,228 @@ export const generateQuestions= async(req,res)=>{
     }
 }
 
-export const submitAnswers= async(req,res)=>{
+export const submitAnswer= async(req,res)=>{
     try{
         const {interviewId , questionIndex , answer , timeTaken }=req.body;
 
-    }catch(err){
+        const interview=await Interview.findById(interviewId);
+        const question=interview.questions[questionIndex];
 
+        if(!answer){
+            question.score=0;
+            question.feedback="You did not submit an answer.";
+            question.answer="";
+
+            await interview.save();
+
+            return res.status(200).json({
+                feedback:question.feedback
+            });
+        }
+
+        const messages=[
+            {
+                role:"system",
+                content:`
+                You are a highly experienced, unbiased, and professional interview evaluator.
+
+Your task is to evaluate a candidate’s answer as a real human interviewer would in a professional interview setting.
+
+---
+
+EVALUATION CRITERIA:
+
+You must evaluate the answer across THREE dimensions:
+
+1. confidence (0–10)
+
+   * How confidently the candidate communicates
+   * Clarity, tone, and decisiveness
+
+2. communication (0–10)
+
+   * Structure of answer
+   * Clarity of explanation
+   * Ability to articulate thoughts clearly
+
+3. correctness (0–10)
+
+   * Technical accuracy
+   * Relevance to the question
+   * Depth of understanding
+
+---
+FINAL SCORE:
+
+Compute:
+finalScore = average(confidence, communication, correctness)
+Rules:
+Must be a number between 0–10
+Round to 1 decimal place (e.g., 6.7)
+Must logically reflect the three scores
+DO NOT assign randomly
+---
+STRICT SCORING RULES:
+
+* Scores must be realistic and justified
+* DO NOT give high scores (8–10) unless the answer is truly strong
+* Average or incomplete answers should fall in 4–7 range
+* Weak, vague, or incorrect answers should be below 4
+* Avoid giving all scores the same value unless clearly justified
+* Be honest, not polite
+
+---
+
+FAIRNESS & BIAS RULES:
+
+* Be completely unbiased
+* Do NOT assume anything beyond the given answer
+* Do NOT favor length over quality
+* Do NOT penalize minor grammar issues if meaning is clear
+* Focus on substance, clarity, and correctness
+
+---
+
+FEEDBACK STYLE (VERY IMPORTANT):
+
+* Feedback must feel like a REAL HUMAN INTERVIEWER
+* Be constructive, honest, and helpful
+* Avoid generic phrases like:
+
+  * "Good job"
+  * "Nice answer"
+
+Instead:
+
+* Point out specific strengths
+* Clearly highlight mistakes or gaps
+* Suggest how to improve
+
+Feedback should:
+
+* Help the candidate improve step-by-step
+* Be practical and actionable
+* Be concise but meaningful (3–6 lines)
+
+---
+
+OUTPUT FORMAT (STRICT JSON):
+
+{
+"confidence": number (0-10),
+"communication": number (0-10),
+"correctness": number (0-10),
+"feedback": "Detailed, human-like feedback here"
+"finalScore": number (0-10)
+}
+
+---
+
+IMPORTANT:
+
+* Return ONLY valid JSON
+* Do NOT include explanations outside JSON
+* Do NOT include extra text
+
+---
+
+GOAL:
+
+Evaluate like a real expert interviewer — fair, strict, and genuinely helpful for improvement.
+
+                `
+            },
+            {
+                role:"user",
+                content:`
+                Question: ${question.question},
+                Answer: ${answer}
+                `
+            }
+        ];
+        const aiResponse= await askAi(messages);
+        const parsed=parseAiJson(aiResponse);
+
+        question.answer=answer;
+        question.confidence=parsed.confidence;
+        question.communication=parsed.communication;
+        question.correctness=parsed.correctness;
+        question.score=parsed.finalScore;
+        question.feedback=parsed.feedback;
+
+        await interview.save();
+
+        return res.status(200).json({
+            feedback:parsed.feedback
+        });
+    }catch(err){
+        return res.status(500).json({
+            success:false,
+            message:"something went wrong while evalution of answer..",
+            err
+        })
+    }
+}
+
+export const finishInterview = async(req,res) =>{
+    try{
+        const {interviewId} =req.body;
+        const interview=await Interview.findById(interviewId);
+
+        if(!interview){
+            return res.status(404).json({
+            success:false,
+            message:"interview not found..",
+            err
+        })
+        }
+
+        const totalQuestions = interview.questions.length;
+
+        let totalScore=0;
+        let totalConfidence=0;
+        let totalCommunication=0;
+        let totalCorrectness=0;
+
+        interview.questions.forEach((q)=>{
+            totalScore+=q.score || 0;
+            totalConfidence+= q.confidence || 0;
+            totalCommunication+= q.communication || 0;
+            totalCorrectness+= q.correctness || 0;
+        });
+
+        const finalScore=totalQuestions? totalScore/totalQuestions : 0;
+
+        const avgConfidence= totalQuestions? totalConfidence/totalQuestions : 0;
+        const avgCommunication= totalQuestions? totalCommunication/totalQuestions : 0;
+        const avgCorrectness= totalQuestions? totalCorrectness/totalQuestions : 0;
+
+        interview.finalScore=finalScore;
+        interview.status="completed";
+
+        await interview.save();
+
+        return res.status(200).json({
+            finalScore:Number(finalScore.toFixed(1)),
+            confidence:Number(avgConfidence.toFixed(1)),
+            communication:Number(avgCommunication.toFixed(1)),
+            correctness:Number(avgCorrectness.toFixed(1)),
+            questionWiseScore: interview.questions.map((q)=>({
+                question:q.question,
+                score: q.score || 0,
+                confidence: q.confidence || 0,
+                communication: q.communication || 0,
+                correctness: q.correctness || 0,
+                answer: q.answer || "",
+                feedback: q.feedback|| ""
+            }))
+        })
+
+    }catch(err){
+        return res.status(500).json({
+            success:false,
+            message:"failed to finish-interview & generate report ..",
+            err
+        })
     }
 }
