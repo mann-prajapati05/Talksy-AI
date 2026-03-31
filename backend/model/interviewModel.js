@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import User from "./user";
+import User from "./user.js";
 
 const questionsSchema = new mongoose.Schema({
     question:String,

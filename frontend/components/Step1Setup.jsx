@@ -146,7 +146,9 @@ function Step1Setup({ onStart }) {
       console.log(result.data);
 
       if (userData) {
-        dispatch(setUserData({ ...user, credits: result.data.creditsLeft }));
+        dispatch(
+          setUserData({ ...userData, credits: result.data.creditsLeft }),
+        );
       }
       setLoading(false);
       onStart(result.data);

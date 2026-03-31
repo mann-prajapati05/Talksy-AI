@@ -33,7 +33,6 @@ export function parseAndValidateQuestions(aiResponse) {
     if (!Array.isArray(parsed)) {
       throw new Error("Response is not an array");
     }
-
     // 🔹 Step 5: Validate each object
     parsed.forEach((item, index) => {
       if (typeof item !== "object") {
@@ -170,7 +169,7 @@ export const analyzeResume= async(req,res) =>{
 
 export const generateQuestions= async(req,res)=>{
     try{
-        let {role,experience,mode,projects,skills,resumeText}=req.boody;
+        let {role,experience,mode,projects,skills,resumeText}=req.body;
         role=role?.trim();
         experience=experience?.trim();
         mode=mode?.trim();
@@ -316,7 +315,7 @@ export const generateQuestions= async(req,res)=>{
                 {
                 "id": 1,
                 "question": "Human-like question here",
-                "type": "Technical | Behavioral | Project | Scenario",
+                "type": "technical | behavioral | project | scenario",
                 "difficulty": "easy | medium | hard"
                 }
                 ]
@@ -347,25 +346,33 @@ export const generateQuestions= async(req,res)=>{
                 message:"AI failed to generate valid questions.."
             });
         }
-
         user.credits -=20;
         await user.save();
-
+        console.log("question generate okk..",parsedQuestionsArray);
         const difficultyTimeMap = {
             easy: 60,
             medium: 90,
             hard: 120,
         };
-
+        const capitalize = (str) => {
+            if (!str || typeof str !== "string") return str;
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        };
         const interview= new Interview({userId:user._id , role, experience , mode , resumeText:safeResume ,
-        questions:parsedQuestionsArray.map((q)=>({
-            question:q.question,
-            difficulty:q.difficulty,
-            questionType:q.type,
-            timeLimit:difficultyTimeMap[q.difficulty] || 60
-        }))
-        });
+        questions: parsedQuestionsArray.map((q) => {
+            const difficulty = q.difficulty?.toLowerCase();
+            const type = q.type?.toLowerCase();
 
+            return {
+            question: q.question,
+            difficulty: capitalize(difficulty),
+            questionType: capitalize(type),
+            timeLimit: difficultyTimeMap[difficulty] || 60,
+            };
+        }),
+        });
+        await interview.save();
+        console.log("final prepared interview.. ",interview.questions);
         res.status(201).json({
             interviewId:interview._id,
             creditsLeft:user.credits,
@@ -374,6 +381,7 @@ export const generateQuestions= async(req,res)=>{
         });
 
     }catch(err){
+        console.log(err);
         return res.status(500).json({
             success:false,
             message:"something went wrong while preparing interview..",
