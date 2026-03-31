@@ -337,7 +337,7 @@ export const generateQuestions= async(req,res)=>{
                 message:"AI returned empty response.."
             });
         }
-
+        console.log(aiResponse);
         const parsedQuestionsArray= parseAndValidateQuestions(aiResponse);
 
         if(parsedQuestionsArray.length===0){
