@@ -5,63 +5,118 @@ import Interview from '../model/interviewModel.js';
 import User from '../model/user.js';
 
 export function parseAndValidateQuestions(aiResponse) {
-  try {
     if (!aiResponse || typeof aiResponse !== "string") {
-      throw new Error("Invalid AI response");
+        throw new Error("Invalid AI response");
     }
 
-    // 🔹 Step 1: Extract JSON array from response
-    const start = aiResponse.indexOf("[");
-    const end = aiResponse.lastIndexOf("]");
+    const cleanedResponse = aiResponse
+        .replace(/```json\s*/gi, "")
+        .replace(/```/g, "")
+        .trim();
 
-    if (start === -1 || end === -1) {
-      throw new Error("No JSON array found in response");
-    }
+    const normalizeType = (rawType) => {
+        const normalized = String(rawType || "").trim().toLowerCase();
 
-    const jsonString = aiResponse.slice(start, end + 1);
+        if (["technical", "tech"].includes(normalized)) return "technical";
+        if (["behavioral", "behavioural", "behavior", "behaviour"].includes(normalized)) {
+            return "behavioral";
+        }
+        if (["project", "project-based", "project based"].includes(normalized)) {
+            return "project";
+        }
+        if (["scenario", "situational", "system-design", "system design", "design"].includes(normalized)) {
+            return "scenario";
+        }
 
-    // 🔹 Step 2: Remove common issues
-    const cleaned = jsonString
-      .replace(/,\s*]/g, "]") // remove trailing commas
-      .replace(/\n/g, " ")    // remove line breaks
-      .trim();
-
-    // 🔹 Step 3: Parse JSON
-    const parsed = JSON.parse(cleaned);
-
-    // 🔹 Step 4: Validate structure
-    if (!Array.isArray(parsed)) {
-      throw new Error("Response is not an array");
-    }
-    // 🔹 Step 5: Validate each object
-    parsed.forEach((item, index) => {
-      if (typeof item !== "object") {
-        throw new Error(`Item at index ${index} is not an object`);
-      }
-
-      if (!item.question || typeof item.question !== "string") {
-        throw new Error(`Invalid question at index ${index}`);
-      }
-
-      if (!item.type || !["technical", "behavioral", "project", "scenario"].includes(item.type)) {
-        throw new Error(`Invalid type at index ${index}`);
-      }
-
-      if (!item.difficulty || !["easy", "medium", "hard"].includes(item.difficulty)) {
-        throw new Error(`Invalid difficulty at index ${index}`);
-      }
-    });
-
-    return parsed;
-
-  } catch (error) {
-    console.error("AI Response Parsing Error:", error.message);
-
-    return {
-      success: false,
-      error: error.message,
+        return "scenario";
     };
-  }
+
+    const normalizeDifficulty = (rawDifficulty) => {
+        const normalized = String(rawDifficulty || "").trim().toLowerCase();
+        if (["easy", "medium", "hard"].includes(normalized)) return normalized;
+        return "medium";
+    };
+
+    const tryParseArray = (candidate) => {
+        if (!candidate) return null;
+
+        const sanitized = String(candidate)
+            .replace(/,\s*([}\]])/g, "$1")
+            .trim();
+
+        try {
+            const parsed = JSON.parse(sanitized);
+            return Array.isArray(parsed) ? parsed : null;
+        } catch {
+            return null;
+        }
+    };
+
+    const buildRepairCandidate = (source) => {
+        const start = source.indexOf("[");
+        if (start === -1) return null;
+
+        let candidate = source.slice(start).trim();
+
+        // If there is a proper closing bracket, drop any trailing extra text.
+        const lastCloseBracket = candidate.lastIndexOf("]");
+        if (lastCloseBracket !== -1) {
+            candidate = candidate.slice(0, lastCloseBracket + 1);
+        }
+
+        candidate = candidate.replace(/,\s*$/g, "");
+
+        const openCurly = (candidate.match(/{/g) || []).length;
+        const closeCurly = (candidate.match(/}/g) || []).length;
+        const openSquare = (candidate.match(/\[/g) || []).length;
+        const closeSquare = (candidate.match(/\]/g) || []).length;
+
+        if (openCurly > closeCurly) {
+            candidate += "}".repeat(openCurly - closeCurly);
+        }
+        if (openSquare > closeSquare) {
+            candidate += "]".repeat(openSquare - closeSquare);
+        }
+
+        return candidate;
+    };
+
+    const firstArrayStart = cleanedResponse.indexOf("[");
+    const lastArrayEnd = cleanedResponse.lastIndexOf("]");
+
+    const parseCandidates = [
+        cleanedResponse,
+        firstArrayStart !== -1 && lastArrayEnd !== -1 && firstArrayStart < lastArrayEnd
+            ? cleanedResponse.slice(firstArrayStart, lastArrayEnd + 1)
+            : null,
+        buildRepairCandidate(cleanedResponse),
+    ];
+
+    let parsedArray = null;
+    for (const candidate of parseCandidates) {
+        parsedArray = tryParseArray(candidate);
+        if (parsedArray) break;
+    }
+
+    if (!parsedArray) {
+        throw new Error("No valid JSON array found in AI response");
+    }
+
+    const normalizedQuestions = parsedArray
+        .filter((item) => item && typeof item === "object")
+        .map((item, index) => ({
+            id: Number(item.id) || index + 1,
+            question: String(item.question || "").trim(),
+            type: normalizeType(item.type),
+            difficulty: normalizeDifficulty(item.difficulty),
+        }))
+        .filter((item) => item.question.length > 0);
+
+    if (!normalizedQuestions.length) {
+        throw new Error("Parsed question array is empty after normalization");
+    }
+
+    return normalizedQuestions;
 }
 
 
@@ -370,7 +425,7 @@ export const generateQuestions= async(req,res)=>{
         console.log(aiResponse);
         const parsedQuestionsArray= parseAndValidateQuestions(aiResponse);
 
-        if(parsedQuestionsArray.length===0){
+        if(!Array.isArray(parsedQuestionsArray) || parsedQuestionsArray.length===0){
             return res.status(500).json({
                 success:false,
                 message:"AI failed to generate valid questions.."
