@@ -8,6 +8,61 @@ import { setUserData } from "../src/redux/userSlice";
 const EXPERIENCE_OPTIONS = ["Fresher", "1-3 years", "3+ years"];
 const INTERVIEW_MODES = ["Technical", "HR", "Mixed"];
 
+const normalizeExperienceOption = (rawExperience) => {
+  const normalized = String(rawExperience || "")
+    .trim()
+    .toLowerCase();
+
+  if (!normalized) return "";
+  if (normalized.includes("fresher")) return "Fresher";
+  if (normalized.includes("1-3") || normalized.includes("1 to 3")) {
+    return "1-3 years";
+  }
+  if (normalized.includes("3+") || normalized.includes("3 plus")) {
+    return "3+ years";
+  }
+
+  return "";
+};
+
+const normalizeExtractedExperience = (rawExperience) => {
+  const list = Array.isArray(rawExperience)
+    ? rawExperience
+    : rawExperience
+      ? [rawExperience]
+      : [];
+
+  return list.filter(Boolean).map((entry) => {
+    if (typeof entry === "string") {
+      return {
+        company: "",
+        type: "",
+        mode: "",
+        employment: "",
+        description: entry,
+      };
+    }
+
+    if (typeof entry === "object") {
+      return {
+        company: String(entry.company || "").trim(),
+        type: String(entry.type || "").trim(),
+        mode: String(entry.mode || "").trim(),
+        employment: String(entry.employment || "").trim(),
+        description: String(entry.description || "").trim(),
+      };
+    }
+
+    return {
+      company: "",
+      type: "",
+      mode: "",
+      employment: "",
+      description: "",
+    };
+  });
+};
+
 const containerVariants = {
   hidden: { opacity: 0, y: 24 },
   show: {
@@ -34,7 +89,7 @@ const sectionVariants = {
 function SectionLabel({ title, hint }) {
   return (
     <div className="mb-3 flex items-center justify-between gap-3">
-      <p className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-400">
+      <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
         {title}
       </p>
       {hint ? <p className="text-xs text-slate-500">{hint}</p> : null}
@@ -66,9 +121,10 @@ function Step1Setup({ onStart }) {
 
   const [role, setRole] = useState("");
   const [experience, setExperience] = useState("");
-  const [mode, setMode] = useState("Technical");
+  const [mode, setMode] = useState("");
   const [resumeFile, setResumeFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [extractedExperience, setExtractedExperience] = useState([]);
   const [projects, setProjects] = useState([]);
   const [skills, setSkills] = useState([]);
   const [resumeText, setResumeText] = useState("");
@@ -92,8 +148,18 @@ function Step1Setup({ onStart }) {
         },
       );
 
-      setRole(result.data.role || "");
-      setExperience(result.data.experience || "");
+      const extractedList = normalizeExtractedExperience(
+        result.data?.experience,
+      );
+      const suggestedExperience = normalizeExperienceOption(
+        extractedList[0]?.description,
+      );
+
+      if (!experience && suggestedExperience) {
+        setExperience(suggestedExperience);
+      }
+
+      setExtractedExperience(extractedList);
       setProjects(result.data.projects || []);
       setSkills(result.data.skills || []);
       setResumeText(result.data.resumeText || "");
@@ -122,7 +188,10 @@ function Step1Setup({ onStart }) {
   };
 
   const canStart =
-    Boolean(role.trim()) && Boolean(experience.trim()) && !analyzing;
+    Boolean(role.trim()) &&
+    Boolean(experience.trim()) &&
+    Boolean(mode.trim()) &&
+    !analyzing;
 
   const handleStartInterview = async () => {
     if (!canStart || loading) return;
@@ -321,6 +390,55 @@ function Step1Setup({ onStart }) {
 
                     <div className="mt-3">
                       <p className="text-xs uppercase tracking-[0.08em] text-slate-400">
+                        Experience
+                      </p>
+                      <div className="mt-2 space-y-2">
+                        {extractedExperience.length ? (
+                          extractedExperience.map((item, index) => (
+                            <div
+                              key={`experience-${index}`}
+                              className="rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-slate-200"
+                            >
+                              <div className="grid gap-2 sm:grid-cols-2">
+                                <p>
+                                  <span className="text-slate-400">
+                                    Company:{" "}
+                                  </span>
+                                  {item.company || "Not specified"}
+                                </p>
+                                <p>
+                                  <span className="text-slate-400">Type: </span>
+                                  {item.type || "Not specified"}
+                                </p>
+                                <p>
+                                  <span className="text-slate-400">Mode: </span>
+                                  {item.mode || "Not specified"}
+                                </p>
+                                <p>
+                                  <span className="text-slate-400">
+                                    Employment:{" "}
+                                  </span>
+                                  {item.employment || "Not specified"}
+                                </p>
+                              </div>
+                              <p className="mt-2 text-slate-300">
+                                <span className="text-slate-400">
+                                  Description:{" "}
+                                </span>
+                                {item.description || "Not specified"}
+                              </p>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-sm text-slate-400">
+                            No experience extracted yet.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="mt-3">
+                      <p className="text-xs uppercase tracking-[0.08em] text-slate-400">
                         Skills
                       </p>
                       <div className="mt-2 flex flex-wrap gap-2">
@@ -391,7 +509,7 @@ function Step1Setup({ onStart }) {
               </motion.button>
               {!canStart ? (
                 <p className="mt-2 text-center text-xs text-slate-400">
-                  Add your role and experience level to continue.
+                  Fill role, experience, and interview mode to continue.
                 </p>
               ) : null}
             </motion.div>

@@ -125,15 +125,46 @@ export const analyzeResume= async(req,res) =>{
             {
                 role:"system",
                 content:`
-                Extract structured data from resume.
+                Extract structured data from the provided resume.
+
                 Return strictly valid JSON only.
-                Do not include markdown, code fences, or explanations.
+                Do NOT include markdown, code fences, comments, or any explanations.
+                Ensure the response is directly parsable using JSON.parse().
+
+                Output format:
                 {
-                    "role":"string",
-                    "experience":"string",
-                    "projects":["project1","project2",..],
-                    "skills":["skill1","skill2",..]
+                "experience": [
+                {
+                "company": "",
+                "type": "", // job or internship
+                "mode": "", // remote or office (or hybrid if explicitly mentioned)
+                "employment": "", // part-time or full-time
+                "description": ""
                 }
+                ],
+                "projects": ["project1", "project2", ...],
+                "skills": ["skill1", "skill2", ...]
+                }
+
+                Instructions:
+
+                Extract ALL relevant information accurately from the resume.
+                For "experience":
+                Each entry MUST include:
+                company name
+                type (job/internship)
+                mode (remote/office/hybrid)
+                employment type (part-time/full-time)
+                short description of work done
+                If any field is not explicitly mentioned, set its value to null.
+                Do NOT infer or hallucinate missing details.
+                Keep descriptions concise but meaningful.
+
+                Strict Rules:
+
+                Output ONLY valid JSON.
+                No trailing commas.
+                No additional text before or after JSON.
                 `
             },
             {
@@ -148,7 +179,6 @@ export const analyzeResume= async(req,res) =>{
         fs.unlinkSync(filepath);
 
         res.json({
-            role:parsed.role || '',
             experience:parsed.experience || '',
             projects:Array.isArray(parsed.projects) ? parsed.projects : [],
             skills:Array.isArray(parsed.skills) ? parsed.skills : [],
