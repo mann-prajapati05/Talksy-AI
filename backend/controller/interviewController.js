@@ -225,9 +225,9 @@ export const generateQuestions= async(req,res)=>{
         * Focus more on ${mode} style interview
         * Personalize questions using projects and skills
 
-        Return EXACTLY 20 questions in the specified JSON format.
+        Return questions in the specified JSON format.
         `;
-
+        const noOfQuestions=5;
         if(!userPrompt.trim()){
             return res.status(400).json({
                 success:false,
@@ -241,13 +241,13 @@ export const generateQuestions= async(req,res)=>{
                 content:`
                 You are a highly experienced, professional interviewer conducting real-world interviews at top tech companies.
 
-                Your task is to generate EXACTLY 20 interview questions tailored to a candidate.
+                Your task is to generate EXACTLY ${noOfQuestions} interview questions tailored to a candidate.
 
                 ---
 
                 STRICT RULES:
 
-                * Generate EXACTLY 20 questions (no more, no less)
+                * Generate EXACTLY ${noOfQuestions} questions (no more, no less)
                 * Do NOT include answers
                 * Do NOT include explanations
                 * Output ONLY valid JSON
@@ -320,7 +320,7 @@ export const generateQuestions= async(req,res)=>{
                 }
                 ]
 
-                Return EXACTLY 20 objects.
+                Return EXACTLY ${noOfQuestions} objects.
                 No extra text outside JSON.
                 `
             },
