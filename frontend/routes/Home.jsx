@@ -1,5 +1,3 @@
-import { motion } from "framer-motion";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function ActionCard({ title, description, cta, icon, onClick }) {
@@ -26,24 +24,13 @@ function ActionCard({ title, description, cta, icon, onClick }) {
 
 function Home() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState(null);
 
   const handleSpeakStart = () => {
-    setActiveTab("speakLab");
     navigate("/speak-lab");
   };
 
   const handleInterviewStart = () => {
-    setActiveTab("mockHire");
     navigate("/mock-hire");
-  };
-
-  const handleTabClick = (tabKey) => {
-    if (tabKey === "speakLab") {
-      handleSpeakStart();
-      return;
-    }
-    handleInterviewStart();
   };
 
   return (
@@ -63,7 +50,7 @@ function Home() {
         </p>
       </header>
 
-      <div className="relative z-10 mt-10 grid gap-5 md:grid-cols-2">
+      <div className="relative z-10 mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         <ActionCard
           title="SpeakLab"
           description="Practice everyday communication with AI"
@@ -103,6 +90,28 @@ function Home() {
                 strokeLinejoin="round"
                 strokeWidth={2}
                 d="M9 12h6m-6 4h6M7 20h10a2 2 0 002-2V6a2 2 0 00-2-2H9l-4 4v10a2 2 0 002 2z"
+              />
+            </svg>
+          }
+        />
+
+        <ActionCard
+          title="Interview History"
+          description="Review your past sessions, scores, and reports in one place"
+          cta="Open History"
+          onClick={() => navigate("/interview-history")}
+          icon={
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
               />
             </svg>
           }

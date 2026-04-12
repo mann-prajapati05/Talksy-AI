@@ -9,6 +9,9 @@ import store from "./redux/store.js";
 import { Provider } from "react-redux";
 import SpeakLab from "../routes/SpeakLab.jsx";
 import MockHire from "../routes/MockHire.jsx";
+import InterviewHistory from "../routes/interviewHistory.jsx";
+import InterviewReport from "../routes/interviewReport.jsx";
+import Pricing from "../routes/Pricing.jsx";
 
 const router = createBrowserRouter([
   {
@@ -34,6 +37,18 @@ const router = createBrowserRouter([
       {
         path: "/mock-hire",
         element: <MockHire />,
+      },
+      {
+        path: "/interview-history",
+        element: <InterviewHistory />,
+      },
+      {
+        path: "/report/:interviewId",
+        element: <InterviewReport />,
+      },
+      {
+        path: "/pricing",
+        element: <Pricing />,
       },
     ],
   },

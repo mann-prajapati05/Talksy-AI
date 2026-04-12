@@ -66,6 +66,11 @@ const Profile = ({ isOpen = false, onClose = () => {} }) => {
     navigate("/login");
   };
 
+  const handleOpenHistory = () => {
+    onClose();
+    navigate("/interview-history");
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -178,6 +183,53 @@ const Profile = ({ isOpen = false, onClose = () => {} }) => {
                       </button>
                     </article>
                   )}
+
+                  <button
+                    type="button"
+                    onClick={handleOpenHistory}
+                    className="group mb-5 flex w-full items-center justify-between rounded-2xl border border-cyan-300/20 bg-linear-to-r from-cyan-400/10 via-white/5 to-indigo-500/10 px-4 py-4 text-left transition-all duration-300 hover:border-cyan-200/40 hover:shadow-[0_14px_34px_rgba(6,182,212,0.16)]"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-300/20 bg-cyan-400/10 text-cyan-100 transition-transform duration-300 group-hover:scale-105">
+                        <svg
+                          className="h-5 w-5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </span>
+                      <div>
+                        <p className="text-sm font-semibold text-slate-100">
+                          Interview History
+                        </p>
+                        <p className="mt-1 text-xs leading-5 text-slate-300">
+                          Open your reports and session archive
+                        </p>
+                      </div>
+                    </div>
+                    <svg
+                      className="h-5 w-5 text-cyan-200 transition-transform duration-300 group-hover:translate-x-1"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M5 12h14m0 0-6-6m6 6-6 6"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
 
                   <div className="grid grid-cols-2 gap-3">
                     <article className="rounded-xl border border-white/10 bg-white/5 p-3">

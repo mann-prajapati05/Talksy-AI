@@ -593,6 +593,11 @@ export const finishInterview = async(req,res) =>{
 
         return res.status(200).json({
             finalScore:Number(finalScore.toFixed(1)),
+            role:interview.role,
+            experience:interview.experience,
+            mode:interview.mode,
+            status:interview.status,
+            createdAt:interview.createdAt,
             confidence:Number(avgConfidence.toFixed(1)),
             communication:Number(avgCommunication.toFixed(1)),
             correctness:Number(avgCorrectness.toFixed(1)),
@@ -613,5 +618,67 @@ export const finishInterview = async(req,res) =>{
             message:"failed to finish-interview & generate report ..",
             err
         })
+    }
+}
+
+export const getMyInterviews = async(req,res)=>{
+    try{
+        const interviews=await Interview.find({userId:req.userId})
+        .sort({createdAt:-1}) //latest
+        .select("role experience mode finalScore status createdAt");
+
+        return res.status(200).json(interviews);
+
+    }catch(err){
+        return res.status(500).json({
+            success:false,
+            message:`Failed to find currentUser interview ${err}`
+        });
+    }
+}
+
+export const getInterviewReport = async(req,res)=>{
+    try{
+        const interviewId = req.params.interviewId;
+        const interview = await Interview.findById(interviewId);
+
+        if(!interview){
+            return res.status(404).json({message:"Interview not found.."});
+        }
+
+        const totalQuestions = interview.questions.length;
+
+        let totalConfidence=0;
+        let totalCommunication=0;
+        let totalCorrectness=0;
+
+        interview.questions.forEach((q)=>{
+            totalConfidence+= q.confidence || 0;
+            totalCommunication+= q.communication || 0;
+            totalCorrectness+= q.correctness || 0;
+        });
+
+        const avgConfidence= totalQuestions? totalConfidence/totalQuestions : 0;
+        const avgCommunication= totalQuestions? totalCommunication/totalQuestions : 0;
+        const avgCorrectness= totalQuestions? totalCorrectness/totalQuestions : 0;
+
+        return res.status(200).json({
+            finalScore:interview.finalScore,
+            role:interview.role,
+            experience:interview.experience,
+            mode:interview.mode,
+            status:interview.status,
+            createdAt:interview.createdAt,
+            confidence:Number(avgConfidence.toFixed(1)),
+            communication:Number(avgCommunication.toFixed(1)),
+            correctness:Number(avgCorrectness.toFixed(1)),
+            questionWiseScore: interview.questions
+        });
+
+    }catch(err){
+        return res.status(500).json({
+            success:false,
+            message:`Failed to find currentUser interview Report ${err}`
+        });
     }
 }
