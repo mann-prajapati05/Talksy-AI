@@ -11,6 +11,7 @@ import {
 import {
   CalendarDays,
   CheckCircle2,
+  Download,
   ChevronDown,
   ChevronUp,
   CircleAlert,
@@ -24,6 +25,8 @@ import {
   Trophy,
 } from "lucide-react";
 import { useSelector } from "react-redux";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const SAFE_SCORE_MIN = 0;
 const SAFE_SCORE_MAX = 10;
@@ -510,12 +513,248 @@ function Step3Report({ report }) {
     weakestQuestion,
   } = normalized;
 
+  const downloadPDF = () => {
+    const doc = new jsPDF("p", "mm", "a4");
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 14;
+
+    const safeCandidate = candidateName || "Candidate";
+    const safeRole = role || "Interview Role";
+    const safeDate = formatDate(createdAt);
+    const safeDuration = durationLabel || "Not recorded";
+    const safeFinalScore = clampScore(finalScore).toFixed(1);
+    const bestScore = clampScore(bestQuestion?.score).toFixed(1);
+    const weakestScore = clampScore(weakestQuestion?.score).toFixed(1);
+
+    const getSkillRemark = (scoreValue) => {
+      const safeScoreValue = clampScore(scoreValue);
+      if (safeScoreValue >= 8) return "Excellent";
+      if (safeScoreValue >= 6) return "Good";
+      if (safeScoreValue >= 4) return "Average";
+      return "Needs improvement";
+    };
+
+    let currentY = 18;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(15, 23, 42);
+    doc.text("Interview Evaluation Report", pageWidth / 2, currentY, {
+      align: "center",
+    });
+
+    currentY += 4;
+    doc.setDrawColor(148, 163, 184);
+    doc.setLineWidth(0.5);
+    doc.line(margin, currentY + 1, pageWidth - margin, currentY + 1);
+    currentY += 8;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(30, 41, 59);
+    doc.text("Candidate & Interview Info", margin, currentY);
+    currentY += 5;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(51, 65, 85);
+
+    const infoRows = [
+      ["Candidate Name", safeCandidate],
+      ["Role / Position", safeRole],
+      ["Date", safeDate],
+      ["Duration", safeDuration],
+      ["Final Score", `${safeFinalScore} / 10`],
+    ];
+
+    autoTable(doc, {
+      startY: currentY,
+      margin: { left: margin, right: margin },
+      theme: "grid",
+      body: infoRows,
+      styles: {
+        font: "helvetica",
+        fontSize: 10,
+        cellPadding: 2.6,
+        textColor: [51, 65, 85],
+      },
+      columnStyles: {
+        0: { cellWidth: 42, fontStyle: "bold", textColor: [15, 23, 42] },
+        1: { cellWidth: "auto" },
+      },
+      didParseCell: (hookData) => {
+        if (
+          hookData.section === "body" &&
+          hookData.row.index === 4 &&
+          hookData.column.index === 1
+        ) {
+          hookData.cell.styles.textColor = [37, 99, 235];
+          hookData.cell.styles.fontStyle = "bold";
+        }
+      },
+    });
+
+    currentY = doc.lastAutoTable.finalY + 8;
+
+    autoTable(doc, {
+      startY: currentY,
+      margin: { left: margin, right: margin },
+      head: [["Skill", "Score", "Remarks"]],
+      body: [
+        [
+          "Correctness",
+          `${clampScore(correctness).toFixed(1)} / 10`,
+          getSkillRemark(correctness),
+        ],
+        [
+          "Communication",
+          `${clampScore(communication).toFixed(1)} / 10`,
+          getSkillRemark(communication),
+        ],
+        [
+          "Confidence",
+          `${clampScore(confidence).toFixed(1)} / 10`,
+          getSkillRemark(confidence),
+        ],
+      ],
+      theme: "striped",
+      styles: {
+        font: "helvetica",
+        fontSize: 10,
+        cellPadding: 2.8,
+      },
+      headStyles: {
+        fillColor: [30, 41, 59],
+        textColor: [255, 255, 255],
+      },
+      columnStyles: {
+        0: { cellWidth: 46 },
+        1: { cellWidth: 30, halign: "center" },
+        2: { cellWidth: "auto" },
+      },
+    });
+
+    currentY = doc.lastAutoTable.finalY + 8;
+
+    if (currentY > pageHeight - 55) {
+      doc.addPage();
+      currentY = 20;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(30, 41, 59);
+    doc.text("Performance Overview", margin, currentY);
+    currentY += 5;
+
+    autoTable(doc, {
+      startY: currentY,
+      margin: { left: margin, right: margin },
+      theme: "grid",
+      body: [
+        ["Average score", `${clampScore(averageScore).toFixed(1)} / 10`],
+        ["Best question score", `${bestScore} / 10`],
+        ["Weakest question score", `${weakestScore} / 10`],
+      ],
+      styles: {
+        font: "helvetica",
+        fontSize: 10,
+        cellPadding: 2.6,
+      },
+      columnStyles: {
+        0: { cellWidth: 58, fontStyle: "bold" },
+        1: { cellWidth: "auto" },
+      },
+    });
+
+    currentY = doc.lastAutoTable.finalY + 8;
+
+    const questionRows = (questionList || []).map((item, index) => [
+      `${index + 1}`,
+      String(item?.question || "Not available"),
+      `${clampScore(item?.score).toFixed(1)} / 10`,
+      String(item?.feedback || "Feedback not available"),
+    ]);
+
+    autoTable(doc, {
+      startY: currentY,
+      margin: { left: margin, right: margin },
+      head: [["Question No", "Question", "Score", "Feedback"]],
+      body: questionRows.length
+        ? questionRows
+        : [["-", "Question data not available", "-", "-"]],
+      theme: "grid",
+      styles: {
+        font: "helvetica",
+        fontSize: 9,
+        cellPadding: 2.4,
+        valign: "top",
+        overflow: "linebreak",
+      },
+      headStyles: {
+        fillColor: [30, 41, 59],
+        textColor: [255, 255, 255],
+      },
+      columnStyles: {
+        0: { cellWidth: 22, halign: "center" },
+        1: { cellWidth: 72 },
+        2: { cellWidth: 24, halign: "center" },
+        3: { cellWidth: "auto" },
+      },
+    });
+
+    const generatedAt = new Date();
+    const generatedTimeText = new Intl.DateTimeFormat("en", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(generatedAt);
+
+    const pageCount = doc.getNumberOfPages();
+    for (let page = 1; page <= pageCount; page += 1) {
+      doc.setPage(page);
+      doc.setDrawColor(226, 232, 240);
+      doc.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(100, 116, 139);
+      doc.text("Generated by AI Interview System", margin, pageHeight - 10);
+      doc.text(`Generated: ${generatedTimeText}`, margin, pageHeight - 6);
+      doc.text(
+        `Page ${page} of ${pageCount}`,
+        pageWidth - margin,
+        pageHeight - 8,
+        {
+          align: "right",
+        },
+      );
+    }
+
+    const safeFileName = `Interview_Report_${safeCandidate.replace(/\s+/g, "_")}.pdf`;
+    doc.save(safeFileName);
+  };
+
   return (
     <section className="relative mx-auto mt-6 max-w-6xl px-4 pb-14 sm:px-6 lg:px-8">
       <div className="pointer-events-none absolute -top-14 right-10 h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl" />
       <div className="pointer-events-none absolute -left-16 top-52 h-72 w-72 rounded-full bg-violet-500/12 blur-3xl" />
 
       <div className="relative z-10 space-y-5">
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={downloadPDF}
+            className="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-indigo-600 to-blue-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(59,130,246,0.28)] transition-all duration-300 hover:translate-y-px hover:shadow-[0_16px_34px_rgba(59,130,246,0.35)]"
+          >
+            <Download className="h-4 w-4" />
+            Download Report
+          </button>
+        </div>
+
         <HeaderCard
           candidateName={candidateName}
           role={role}
