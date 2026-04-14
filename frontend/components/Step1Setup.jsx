@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { setUserData } from "../src/redux/userSlice";
+import { useNavigate } from "react-router-dom";
 
 const EXPERIENCE_OPTIONS = ["Fresher", "1-3 years", "3+ years"];
 const INTERVIEW_MODES = ["Technical", "HR", "Mixed"];
@@ -118,6 +119,7 @@ function OptionButton({ active, label, onClick }) {
 function Step1Setup({ onStart }) {
   const { userData } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [role, setRole] = useState("");
   const [experience, setExperience] = useState("");
@@ -138,7 +140,10 @@ function Step1Setup({ onStart }) {
 
     const formData = new FormData();
     formData.append("resume", resumeFile);
-
+    if (userData === null) {
+      navigate("/login");
+      return;
+    }
     try {
       const result = await axios.post(
         "http://localhost:8010/interview/resume-analyze",
@@ -196,7 +201,11 @@ function Step1Setup({ onStart }) {
   const handleStartInterview = async () => {
     if (!canStart || loading) return;
     setLoading(true);
-
+    console.log(userData);
+    if (userData === null) {
+      navigate("/login");
+      return;
+    }
     try {
       const result = await axios.post(
         "http://localhost:8010/interview/generate-questions",

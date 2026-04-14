@@ -6,24 +6,37 @@ export const askAi = async(messages) =>{
             throw new Error("Messages array is empty..");
         }
 
-        const response = await axios.post("https://openrouter.ai/api/v1/chat/completions",{
-            model:'openrouter/free',
-            messages:messages
-        },
-        {
-            headers: {
-                Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-                'Content-Type': 'application/json',
-            },
-        }
-        );
+        const modelsToTry = [
+            'stepfun-ai/step-3.5-flash:free',
+            'nvidia/nemotron-3-super:free',
+            'openrouter/free'
+        ];
 
-        const content= response?.data?.choices?.[0]?.message?.content;
-        if(!content || !content.trim()){
-            throw new Error("AI returned empty response...");
+        for(const model of modelsToTry){
+            try{
+                const response = await axios.post("https://openrouter.ai/api/v1/chat/completions",{
+                    model,
+                    messages:messages,
+                    ...(model === 'openrouter/free' ? {} : { provider: { allowFallbacks: false } })
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+                );
+
+                const content= response?.data?.choices?.[0]?.message?.content;
+                if(content && content.trim()){
+                    return content;
+                }
+            }catch(modelErr){
+                console.log(`Open router model failed (${model})..`, modelErr.response?.data || modelErr.message);
+            }
         }
 
-        return content;
+        throw new Error("AI returned empty response...");
     }catch(err){
         console.log("Open router Error..", err.response?.data || err.message);
         throw new Error("OpenRouter API Error..");
