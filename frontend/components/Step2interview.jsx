@@ -61,6 +61,8 @@ function Step2interview({ interviewData, onFinish }) {
 
   const videoRef = useRef(null);
   const answerInputRef = useRef(null);
+  const hasCompletedIntroRef = useRef(false);
+  const isRunningIntroRef = useRef(false);
 
   const currentQuestion = questions[currentIndex];
 
@@ -91,6 +93,38 @@ function Step2interview({ interviewData, onFinish }) {
     return englishVoice || voices[0] || null;
   };
 
+  const waitForVoices = () => {
+    return new Promise((resolve) => {
+      if (!window.speechSynthesis?.getVoices) {
+        resolve();
+        return;
+      }
+
+      if (window.speechSynthesis.getVoices().length > 0) {
+        resolve();
+        return;
+      }
+
+      const onVoicesChanged = () => {
+        window.speechSynthesis.removeEventListener(
+          "voiceschanged",
+          onVoicesChanged,
+        );
+        resolve();
+      };
+
+      window.speechSynthesis.addEventListener("voiceschanged", onVoicesChanged);
+
+      setTimeout(() => {
+        window.speechSynthesis.removeEventListener(
+          "voiceschanged",
+          onVoicesChanged,
+        );
+        resolve();
+      }, 500);
+    });
+  };
+
   // text to voice function
   const speakText = (text) => {
     return new Promise((resolve) => {
@@ -99,69 +133,86 @@ function Step2interview({ interviewData, onFinish }) {
         return;
       }
 
-      window.speechSynthesis.cancel(); // cancel previous voice
+      waitForVoices().then(() => {
+        window.speechSynthesis.cancel(); // cancel previous voice
 
-      //to add natural pauses after commas and periods
-      const humanText = (text || "")
-        .replace(/,/g, ", ...")
-        .replace(/\./g, ". ... ");
+        const cleanText = (text || "").trim().replace(/\s+/g, " ");
 
-      const utterance = new SpeechSynthesisUtterance(humanText);
-      const selectedVoice = getPreferredVoice();
-      if (selectedVoice) {
-        utterance.voice = selectedVoice;
-      }
+        //to add natural pauses after commas and periods
+        const humanText = cleanText
+          .replace(/,/g, ", ...")
+          .replace(/\./g, ". ... ");
 
-      //human like pacing
-      utterance.rate = 0.92; //slightly slower than normal
-      utterance.pitch = 1.05; //small warmth
-      utterance.volume = 1;
-
-      utterance.onstart = () => {
-        setIsAiPlaying(true);
-        stopMic();
-        videoRef.current?.play();
-      };
-
-      utterance.onend = () => {
-        videoRef.current?.pause();
-        if (videoRef.current) {
-          videoRef.current.currentTime = 0;
+        const utterance = new SpeechSynthesisUtterance(humanText);
+        const selectedVoice = getPreferredVoice();
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
         }
-        setIsAiPlaying(false);
 
-        if (isMicOn) startMic();
+        //human like pacing
+        utterance.rate = 0.92; //slightly slower than normal
+        utterance.pitch = 1.05; //small warmth
+        utterance.volume = 1;
 
-        setTimeout(() => {
+        utterance.onstart = () => {
+          setIsAiPlaying(true);
+          stopMic();
+          videoRef.current?.play();
+        };
+
+        utterance.onend = () => {
+          videoRef.current?.pause();
+          if (videoRef.current) {
+            videoRef.current.currentTime = 0;
+          }
+          setIsAiPlaying(false);
+
+          if (isMicOn && !isIntroPhase) startMic();
+
+          setTimeout(() => {
+            setSubtitle("");
+            resolve();
+          }, 300);
+        };
+
+        utterance.onerror = () => {
+          setIsAiPlaying(false);
           setSubtitle("");
           resolve();
-        }, 300);
-      };
+        };
 
-      utterance.onerror = () => {
-        setIsAiPlaying(false);
-        setSubtitle("");
-        resolve();
-      };
-
-      setSubtitle(text);
-      window.speechSynthesis.speak(utterance);
+        setSubtitle(cleanText);
+        window.speechSynthesis.speak(utterance);
+      });
     });
   };
 
   useEffect(() => {
     const runIntro = async () => {
       if (isIntroPhase) {
-        await speakText(`
-          Hi ${userName}, it's great to meet you today. I hope you're feeling confident and ready. 
-          `);
+        if (hasCompletedIntroRef.current || isRunningIntroRef.current) {
+          return;
+        }
 
-        await speakText(`
-          I'll ask you some questions. just answer naturally, and take your time. Let's begin.
-          `);
+        isRunningIntroRef.current = true;
+        await new Promise((r) => setTimeout(r, 300));
 
+        await speakText(
+          `Hi ${userName}, it's great to meet you today. I hope you're feeling confident and ready.`,
+        );
+
+        await speakText(
+          `I'll ask you some questions. Just answer naturally, and take your time. Let's begin.`,
+        );
+
+        hasCompletedIntroRef.current = true;
+        isRunningIntroRef.current = false;
         setIsIntroPhase(false);
       } else if (currentQuestion) {
+        if (!hasCompletedIntroRef.current) {
+          return;
+        }
+
         await new Promise((r) => setTimeout(r, 800));
         if (currentQuestion.questionType?.toLowerCase() === "hard") {
           await speakText("Next Question might be more challenging...");
