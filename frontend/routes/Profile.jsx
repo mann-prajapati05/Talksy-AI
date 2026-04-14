@@ -70,6 +70,10 @@ const Profile = ({ isOpen = false, onClose = () => {} }) => {
     onClose();
     navigate("/interview-history");
   };
+  const handleBuyCredits = () => {
+    onClose();
+    navigate("/pricing");
+  };
 
   return (
     <AnimatePresence>
@@ -177,6 +181,7 @@ const Profile = ({ isOpen = false, onClose = () => {} }) => {
                       </p>
                       <button
                         type="button"
+                        onClick={handleBuyCredits}
                         className="mt-3 w-full rounded-lg border border-cyan-300/30 bg-cyan-400/10 px-3 py-2 text-xs font-semibold text-cyan-100 transition-all duration-300 hover:scale-[1.01] hover:border-cyan-200/50 hover:bg-cyan-400/15 hover:shadow-[0_12px_26px_rgba(34,211,238,0.2)]"
                       >
                         Buy Credits

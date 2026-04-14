@@ -75,9 +75,9 @@ export const verifyPayment = async(req,res) =>{
 
         const updatedUser=await User.findByIdAndUpdate(payment.userId, {
             $inc:{ credits:payment.credits}
-        } , {new:true});
+        } , {returnDocument:'after'});
 
-        res.json(201).json({
+        return res.status(201).json({
             success:true,
             message:"Payment verified and credits added..",
             user:{
