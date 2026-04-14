@@ -1,4 +1,3 @@
-import { useState } from "react";
 import axios from "axios";
 import { Check, Sparkles } from "lucide-react";
 import { useDispatch } from "react-redux";
@@ -53,7 +52,7 @@ const plans = [
   },
 ];
 
-function PricingCard({ plan, creditView, onBuy }) {
+function PricingCard({ plan, onBuy }) {
   const safeName = plan?.name || "Unnamed Plan";
   const safeDescription = plan?.description || "No description available.";
   const safeCredits = Number.isFinite(plan?.credits) ? plan.credits : 0;
@@ -114,11 +113,6 @@ function PricingCard({ plan, creditView, onBuy }) {
             </p>
           </div>
         </div>
-        {creditView === "credits" && (
-          <p className="mt-2 text-xs text-slate-500">
-            Credits-focused view enabled
-          </p>
-        )}
       </div>
 
       <ul className="mt-6 space-y-3">
@@ -165,7 +159,6 @@ function PricingCard({ plan, creditView, onBuy }) {
 }
 
 function Pricing() {
-  const [creditView, setCreditView] = useState("credits");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -247,31 +240,6 @@ function Pricing() {
             Start free and upgrade when you need more interview credits. No
             hidden fees, clear value.
           </p>
-
-          <div className="mx-auto mt-8 inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
-            <button
-              type="button"
-              onClick={() => setCreditView("credits")}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-                creditView === "credits"
-                  ? "bg-slate-900 text-white"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              Credits View
-            </button>
-            <button
-              type="button"
-              onClick={() => setCreditView("pricing")}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-                creditView === "pricing"
-                  ? "bg-slate-900 text-white"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              Pricing View
-            </button>
-          </div>
         </header>
 
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -279,7 +247,6 @@ function Pricing() {
             <PricingCard
               key={plan?.id || plan?.name}
               plan={plan}
-              creditView={creditView}
               onBuy={handlePayment}
             />
           ))}

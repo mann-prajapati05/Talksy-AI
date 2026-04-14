@@ -133,6 +133,10 @@ function Step1Setup({ onStart }) {
   const [analysisDone, setAnalysisDone] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [creditError, setCreditError] = useState("");
+
+  const userCredits = Number(userData?.credits ?? 0);
+  const hasInsufficientCredits = Boolean(userData) && userCredits < 20;
 
   const handleUploadResume = async () => {
     if (!resumeFile || analyzing) return;
@@ -203,9 +207,21 @@ function Step1Setup({ onStart }) {
     setLoading(true);
     console.log(userData);
     if (userData === null) {
+      setLoading(false);
       navigate("/login");
       return;
     }
+
+    if (hasInsufficientCredits) {
+      setCreditError(
+        "Need at least 20 credits to start MockHire. Buy credits to continue.",
+      );
+      setLoading(false);
+      return;
+    }
+
+    setCreditError("");
+
     try {
       const result = await axios.post(
         "http://localhost:8010/interview/generate-questions",
@@ -232,6 +248,12 @@ function Step1Setup({ onStart }) {
       onStart(result.data);
     } catch (err) {
       console.log("Error while Start Interview..", err);
+      const backendMessage = err?.response?.data?.message || "";
+      if (backendMessage.toLowerCase().includes("credit")) {
+        setCreditError(
+          "Need at least 20 credits to start MockHire. Buy credits to continue.",
+        );
+      }
       setLoading(false);
     }
   };
@@ -506,12 +528,34 @@ function Step1Setup({ onStart }) {
             </motion.div>
 
             <motion.div variants={sectionVariants} className="pt-1">
+              {hasInsufficientCredits && (
+                <div className="mb-3 rounded-xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-center">
+                  <p className="text-xs font-semibold tracking-wide text-amber-100 sm:text-sm">
+                    Need at least 20 credits to start interview. You currently
+                    have {userCredits}.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/pricing")}
+                    className="mt-2 rounded-full bg-linear-to-r from-amber-400 to-orange-500 px-4 py-2 text-xs font-semibold text-slate-900 shadow-[0_10px_22px_rgba(251,146,60,0.28)] transition hover:brightness-105"
+                  >
+                    Buy Credits
+                  </button>
+                </div>
+              )}
+
+              {creditError && !hasInsufficientCredits ? (
+                <p className="mb-3 text-center text-xs font-medium text-amber-200">
+                  {creditError}
+                </p>
+              ) : null}
+
               <motion.button
                 whileHover={{ scale: canStart ? 1.015 : 1 }}
                 whileTap={{ scale: canStart ? 0.985 : 1 }}
                 type="button"
                 onClick={handleStartInterview}
-                disabled={!canStart || loading}
+                disabled={!canStart || loading || hasInsufficientCredits}
                 className="w-full rounded-full bg-linear-to-r from-indigo-600 to-violet-600 px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_36px_rgba(99,102,241,0.35)] transition-all duration-300 hover:shadow-[0_18px_40px_rgba(34,211,238,0.28)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? "Starting..." : "Start Interview"}
