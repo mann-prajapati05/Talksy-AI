@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUserData } from "../src/redux/userSlice";
 import Profile from "./Profile";
 
-export const serverUrl = "http://localhost:8010";
+export const serverUrl = "https://talksy-ai.onrender.com";
 
 function App() {
   const dispatch = useDispatch();
