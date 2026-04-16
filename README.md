@@ -4,6 +4,8 @@ Talksy AI is a full-stack AI mock interview platform where users can practice in
 
 It solves a practical interview-prep problem: candidates often do not get realistic, structured practice with actionable feedback. Talksy AI combines resume-based personalization, timed Q&A, and report analytics in one workflow.
 
+Live on : https://talksy-ai-frontend.onrender.com
+
 ## Features
 
 ### Authentication and User Management
