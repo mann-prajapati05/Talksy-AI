@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Step3Report from "../components/Step3Report";
-import { serverUrl } from "../routes/App";
+import { serverUrl } from "./App";
 
-function interviewReport() {
+function InterviewReport() {
   const { interviewId } = useParams();
   const [report, setReport] = useState(null);
 
@@ -30,4 +30,4 @@ function interviewReport() {
   return <Step3Report report={report} />;
 }
 
-export default interviewReport;
+export default InterviewReport;

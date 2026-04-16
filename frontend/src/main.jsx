@@ -8,8 +8,8 @@ import Home from "../routes/Home.jsx";
 import store from "./redux/store.js";
 import { Provider } from "react-redux";
 import MockHire from "../routes/MockHire.jsx";
-import InterviewHistory from "../routes/interviewHistory.jsx";
-import InterviewReport from "../routes/interviewReport.jsx";
+import InterviewHistory from "../routes/InterviewHistory.jsx";
+import InterviewReport from "../routes/InterviewReport.jsx";
 import Pricing from "../routes/Pricing.jsx";
 
 const router = createBrowserRouter([
