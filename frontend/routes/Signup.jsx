@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../src/redux/userSlice";
 axios.defaults.withCredentials = true;
@@ -112,11 +112,11 @@ export default function Signup() {
 
   const getStrengthColor = () => {
     const strength = getPasswordStrength();
-    if (strength === 0) return "bg-slate-600";
-    if (strength === 1) return "bg-rose-500";
-    if (strength === 2) return "bg-indigo-500";
-    if (strength === 3) return "bg-violet-500";
-    return "bg-cyan-400";
+    if (strength === 0) return "bg-slate-200";
+    if (strength === 1) return "bg-red-400";
+    if (strength === 2) return "bg-amber-400";
+    if (strength === 3) return "bg-indigo-400";
+    return "bg-emerald-400";
   };
 
   const getStrengthText = () => {
@@ -129,38 +129,35 @@ export default function Signup() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10">
-      <div className="pointer-events-none absolute -left-20 top-20 h-72 w-72 rounded-full bg-violet-500/15 blur-3xl"></div>
-      <div className="pointer-events-none absolute -right-20 bottom-12 h-72 w-72 rounded-full bg-cyan-400/15 blur-3xl"></div>
-
-      <div className="relative z-10 w-full max-w-md">
+    <div className="flex min-h-[calc(100vh-57px)] items-center justify-center bg-slate-50 px-4 py-10">
+      <div className="w-full max-w-md">
         {/* Header */}
         <div className="mb-8 text-center">
-          <span className="inline-flex rounded-full border border-cyan-300/25 bg-cyan-400/10 px-4 py-1 text-xs font-medium tracking-[0.08em] text-cyan-200">
+          <span className="inline-flex rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1 text-xs font-semibold tracking-wide text-indigo-600">
             TALKSY.AI
           </span>
-          <h1 className="mt-4 text-4xl font-semibold text-slate-100 mb-2">
+          <h1 className="mt-4 text-3xl font-bold text-slate-900 mb-2">
             Create Account
           </h1>
-          <p className="text-slate-300 text-base">
+          <p className="text-slate-600 text-base">
             Join Talksy and start improving your skills
           </p>
         </div>
 
         {/* Signup Card */}
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 shadow-[0_24px_50px_rgba(2,6,23,0.45)] backdrop-blur-xl">
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-lg">
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Full Name Field */}
             <div>
               <label
                 htmlFor="fullName"
-                className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-slate-400"
+                className="mb-2 block text-sm font-medium text-slate-700"
               >
                 Full Name
               </label>
               <div className="relative">
                 <svg
-                  className="absolute left-3 top-3.5 w-5 h-5 text-slate-500"
+                  className="absolute left-3 top-3.5 w-5 h-5 text-slate-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -179,30 +176,30 @@ export default function Signup() {
                   value={formData.fullName}
                   onChange={handleInputChange}
                   placeholder="John Doe"
-                  className={`w-full rounded-xl border bg-slate-900/40 px-4 py-3 pl-11 font-medium text-slate-100 placeholder:text-slate-500 transition-all duration-300 focus:outline-none ${
+                  className={`w-full rounded-lg border bg-white px-4 py-3 pl-11 text-sm text-slate-900 placeholder:text-slate-400 transition-all duration-200 focus:outline-none ${
                     errors.fullName
-                      ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-200"
-                      : "border-white/10 focus:border-indigo-400 focus:ring-2 focus:ring-cyan-400/35"
+                      ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                      : "border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                   }`}
                 />
               </div>
               {errors.fullName && (
-                <p className="text-red-500 text-sm mt-2">{errors.fullName}</p>
+                <p className="text-red-600 text-sm mt-2">{errors.fullName}</p>
               )}
             </div>
 
-            {/* Email Field */}
+            {/* Gender Field */}
             <div>
-              <label className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-slate-400">
+              <label className="mb-2 block text-sm font-medium text-slate-700">
                 Gender
               </label>
               <div className="grid grid-cols-2 gap-3">
                 <label
                   htmlFor="genderMale"
-                  className={`flex items-center gap-3 rounded-lg border-2 px-4 py-3 cursor-pointer transition-all ${
+                  className={`flex items-center gap-3 rounded-lg border-2 px-4 py-3 cursor-pointer transition-all duration-200 ${
                     formData.gender === "male"
-                      ? "border-indigo-400 bg-indigo-500/15"
-                      : "border-white/10 hover:border-cyan-300/35 hover:bg-white/5"
+                      ? "border-indigo-500 bg-indigo-50"
+                      : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
                   } ${errors.gender ? "border-red-300" : ""}`}
                 >
                   <input
@@ -212,19 +209,19 @@ export default function Signup() {
                     value="male"
                     checked={formData.gender === "male"}
                     onChange={handleInputChange}
-                    className="h-4 w-4 border-slate-300 text-indigo-500 focus:ring-cyan-400/35"
+                    className="h-4 w-4 border-slate-300 text-indigo-500 focus:ring-indigo-500/20"
                   />
-                  <span className="text-sm font-medium text-slate-200">
+                  <span className="text-sm font-medium text-slate-700">
                     Male
                   </span>
                 </label>
 
                 <label
                   htmlFor="genderFemale"
-                  className={`flex items-center gap-3 rounded-lg border-2 px-4 py-3 cursor-pointer transition-all ${
+                  className={`flex items-center gap-3 rounded-lg border-2 px-4 py-3 cursor-pointer transition-all duration-200 ${
                     formData.gender === "female"
-                      ? "border-indigo-400 bg-indigo-500/15"
-                      : "border-white/10 hover:border-cyan-300/35 hover:bg-white/5"
+                      ? "border-indigo-500 bg-indigo-50"
+                      : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
                   } ${errors.gender ? "border-red-300" : ""}`}
                 >
                   <input
@@ -234,15 +231,15 @@ export default function Signup() {
                     value="female"
                     checked={formData.gender === "female"}
                     onChange={handleInputChange}
-                    className="h-4 w-4 border-slate-300 text-indigo-500 focus:ring-cyan-400/35"
+                    className="h-4 w-4 border-slate-300 text-indigo-500 focus:ring-indigo-500/20"
                   />
-                  <span className="text-sm font-medium text-slate-200">
+                  <span className="text-sm font-medium text-slate-700">
                     Female
                   </span>
                 </label>
               </div>
               {errors.gender && (
-                <p className="text-red-500 text-sm mt-2">{errors.gender}</p>
+                <p className="text-red-600 text-sm mt-2">{errors.gender}</p>
               )}
             </div>
 
@@ -250,13 +247,13 @@ export default function Signup() {
             <div>
               <label
                 htmlFor="email"
-                className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-slate-400"
+                className="mb-2 block text-sm font-medium text-slate-700"
               >
                 Email Address
               </label>
               <div className="relative">
                 <svg
-                  className="absolute left-3 top-3.5 w-5 h-5 text-slate-500"
+                  className="absolute left-3 top-3.5 w-5 h-5 text-slate-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -275,15 +272,15 @@ export default function Signup() {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="you@example.com"
-                  className={`w-full rounded-xl border bg-slate-900/40 px-4 py-3 pl-11 font-medium text-slate-100 placeholder:text-slate-500 transition-all duration-300 focus:outline-none ${
+                  className={`w-full rounded-lg border bg-white px-4 py-3 pl-11 text-sm text-slate-900 placeholder:text-slate-400 transition-all duration-200 focus:outline-none ${
                     errors.email
-                      ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-200"
-                      : "border-white/10 focus:border-indigo-400 focus:ring-2 focus:ring-cyan-400/35"
+                      ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                      : "border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                   }`}
                 />
               </div>
               {errors.email && (
-                <p className="text-red-500 text-sm mt-2">{errors.email}</p>
+                <p className="text-red-600 text-sm mt-2">{errors.email}</p>
               )}
             </div>
 
@@ -291,13 +288,13 @@ export default function Signup() {
             <div>
               <label
                 htmlFor="password"
-                className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-slate-400"
+                className="mb-2 block text-sm font-medium text-slate-700"
               >
                 Password
               </label>
               <div className="relative">
                 <svg
-                  className="absolute left-3 top-3.5 w-5 h-5 text-slate-500"
+                  className="absolute left-3 top-3.5 w-5 h-5 text-slate-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -316,16 +313,16 @@ export default function Signup() {
                   value={formData.password}
                   onChange={handleInputChange}
                   placeholder="••••••••"
-                  className={`w-full rounded-xl border bg-slate-900/40 px-4 py-3 pl-11 pr-11 font-medium text-slate-100 placeholder:text-slate-500 transition-all duration-300 focus:outline-none ${
+                  className={`w-full rounded-lg border bg-white px-4 py-3 pl-11 pr-11 text-sm text-slate-900 placeholder:text-slate-400 transition-all duration-200 focus:outline-none ${
                     errors.password
-                      ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-200"
-                      : "border-white/10 focus:border-indigo-400 focus:ring-2 focus:ring-cyan-400/35"
+                      ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                      : "border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3.5 text-slate-500 transition-colors hover:text-slate-200"
+                  className="absolute right-3 top-3.5 text-slate-400 transition-colors hover:text-slate-600"
                 >
                   {showPassword ? (
                     <svg
@@ -361,19 +358,19 @@ export default function Signup() {
               {formData.password && (
                 <div className="mt-3 space-y-2">
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
+                    <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
                       <div
-                        className={`h-full transition-all ${getStrengthColor()}`}
+                        className={`h-full rounded-full transition-all duration-300 ${getStrengthColor()}`}
                         style={{
                           width: `${(getPasswordStrength() / 4) * 100}%`,
                         }}
                       ></div>
                     </div>
-                    <span className="text-xs font-semibold text-slate-600">
+                    <span className="text-xs font-medium text-slate-500">
                       {getStrengthText()}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-400">
                     Use 6+ characters, uppercase, and numbers for a strong
                     password
                   </p>
@@ -381,7 +378,7 @@ export default function Signup() {
               )}
 
               {errors.password && (
-                <p className="text-red-500 text-sm mt-2">{errors.password}</p>
+                <p className="text-red-600 text-sm mt-2">{errors.password}</p>
               )}
             </div>
 
@@ -389,13 +386,13 @@ export default function Signup() {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-slate-400"
+                className="mb-2 block text-sm font-medium text-slate-700"
               >
                 Confirm Password
               </label>
               <div className="relative">
                 <svg
-                  className="absolute left-3 top-3.5 w-5 h-5 text-slate-500"
+                  className="absolute left-3 top-3.5 w-5 h-5 text-slate-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -414,20 +411,20 @@ export default function Signup() {
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   placeholder="••••••••"
-                  className={`w-full rounded-xl border bg-slate-900/40 px-4 py-3 pl-11 pr-11 font-medium text-slate-100 placeholder:text-slate-500 transition-all duration-300 focus:outline-none ${
+                  className={`w-full rounded-lg border bg-white px-4 py-3 pl-11 pr-11 text-sm text-slate-900 placeholder:text-slate-400 transition-all duration-200 focus:outline-none ${
                     errors.confirmPassword
-                      ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-200"
+                      ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
                       : formData.confirmPassword &&
                           formData.password === formData.confirmPassword &&
                           !errors.confirmPassword
-                        ? "border-green-300 focus:border-green-500 focus:ring-2 focus:ring-green-100"
-                        : "border-white/10 focus:border-indigo-400 focus:ring-2 focus:ring-cyan-400/35"
+                        ? "border-emerald-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                        : "border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-3.5 text-slate-500 transition-colors hover:text-slate-200"
+                  className="absolute right-3 top-3.5 text-slate-400 transition-colors hover:text-slate-600"
                 >
                   {showConfirmPassword ? (
                     <svg
@@ -462,7 +459,7 @@ export default function Signup() {
                 {formData.confirmPassword &&
                   formData.password === formData.confirmPassword &&
                   !errors.confirmPassword && (
-                    <div className="absolute right-11 top-3.5 text-green-500">
+                    <div className="absolute right-11 top-3.5 text-emerald-500">
                       <svg
                         className="w-5 h-5"
                         fill="currentColor"
@@ -478,35 +475,35 @@ export default function Signup() {
                   )}
               </div>
               {errors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-2">
+                <p className="text-red-600 text-sm mt-2">
                   {errors.confirmPassword}
                 </p>
               )}
             </div>
 
             {/* Terms Checkbox */}
-            <div className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 p-4">
+            <div className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
               <input
                 type="checkbox"
                 id="terms"
                 defaultChecked
-                className="mt-0.5 h-5 w-5 cursor-pointer rounded border-2 border-slate-400 text-indigo-500 focus:ring-2 focus:ring-cyan-400/35"
+                className="mt-0.5 h-4 w-4 cursor-pointer rounded border-slate-300 text-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
               />
               <label
                 htmlFor="terms"
-                className="cursor-pointer text-sm text-slate-300"
+                className="cursor-pointer text-sm text-slate-600"
               >
                 I agree to the{" "}
                 <a
                   href="#"
-                  className="font-semibold text-indigo-300 hover:text-cyan-300 hover:underline"
+                  className="font-semibold text-indigo-600 hover:text-indigo-700 hover:underline"
                 >
                   Terms of Service
                 </a>{" "}
                 and{" "}
                 <a
                   href="#"
-                  className="font-semibold text-indigo-300 hover:text-cyan-300 hover:underline"
+                  className="font-semibold text-indigo-600 hover:text-indigo-700 hover:underline"
                 >
                   Privacy Policy
                 </a>
@@ -516,7 +513,7 @@ export default function Signup() {
             {/* Signup Button */}
             <button
               type="submit"
-              className="w-full rounded-full bg-linear-to-r from-indigo-600 to-violet-600 px-4 py-3 text-sm font-medium text-white shadow-[0_12px_28px_rgba(99,102,241,0.35)] transition-all duration-300 hover:-translate-y-px hover:shadow-[0_14px_30px_rgba(34,211,238,0.28)]"
+              className="w-full rounded-lg bg-indigo-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-indigo-600 hover:shadow-md"
             >
               Create Account
             </button>
@@ -525,26 +522,28 @@ export default function Signup() {
           {/* Divider */}
           <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10"></div>
+              <div className="w-full border-t border-slate-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-slate-900/30 text-slate-500">or</span>
+              <span className="px-3 bg-white text-slate-400">or</span>
             </div>
           </div>
 
           {/* Login Link Section */}
           <div className="text-center">
-            <p className="text-sm text-slate-300">
+            <p className="text-sm text-slate-600">
               Already have an account?{" "}
-              <span className="cursor-pointer font-semibold text-indigo-300 transition-colors hover:text-cyan-300">
-                Sign in
-              </span>
+              <Link to="/login">
+                <span className="cursor-pointer font-semibold text-indigo-600 transition-colors hover:text-indigo-700">
+                  Sign in
+                </span>
+              </Link>
             </p>
           </div>
         </div>
 
         {/* Footer */}
-        <p className="mt-8 text-center text-xs text-slate-500">
+        <p className="mt-8 text-center text-xs text-slate-400">
           Join thousands of professionals already using Talksy to master
           interviews
         </p>

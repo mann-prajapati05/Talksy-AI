@@ -88,38 +88,35 @@ const Login = () => {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10">
-      <div className="pointer-events-none absolute -left-20 top-20 h-72 w-72 rounded-full bg-violet-500/15 blur-3xl"></div>
-      <div className="pointer-events-none absolute -right-20 bottom-12 h-72 w-72 rounded-full bg-cyan-400/15 blur-3xl"></div>
-
-      <div className="relative z-10 w-full max-w-md">
+    <div className="flex min-h-[calc(100vh-57px)] items-center justify-center bg-slate-50 px-4 py-10">
+      <div className="w-full max-w-md">
         {/* Header */}
         <div className="mb-8 text-center">
-          <span className="inline-flex rounded-full border border-cyan-300/25 bg-cyan-400/10 px-4 py-1 text-xs font-medium tracking-[0.08em] text-cyan-200">
+          <span className="inline-flex rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1 text-xs font-semibold tracking-wide text-indigo-600">
             TALKSY.AI
           </span>
-          <h1 className="mt-4 text-4xl font-semibold text-slate-100 mb-2">
+          <h1 className="mt-4 text-3xl font-bold text-slate-900 mb-2">
             Welcome Back
           </h1>
-          <p className="text-slate-300 text-base">
+          <p className="text-slate-600 text-base">
             Sign in to your Talksy account
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 shadow-[0_24px_50px_rgba(2,6,23,0.45)] backdrop-blur-xl">
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-lg">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div>
               <label
                 htmlFor="email"
-                className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-slate-400"
+                className="mb-2 block text-sm font-medium text-slate-700"
               >
                 Email Address
               </label>
               <div className="relative">
                 <svg
-                  className="absolute left-3 top-3.5 w-5 h-5 text-slate-500"
+                  className="absolute left-3 top-3.5 w-5 h-5 text-slate-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -138,15 +135,15 @@ const Login = () => {
                   value={email}
                   onChange={handleEmailChange}
                   placeholder="you@example.com"
-                  className={`w-full rounded-xl border bg-slate-900/40 px-4 py-3 pl-11 font-medium text-slate-100 placeholder:text-slate-500 transition-all duration-300 focus:outline-none ${
+                  className={`w-full rounded-lg border bg-white px-4 py-3 pl-11 text-sm text-slate-900 placeholder:text-slate-400 transition-all duration-200 focus:outline-none ${
                     errors.email
-                      ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-200"
-                      : "border-white/10 focus:border-indigo-400 focus:ring-2 focus:ring-cyan-400/35"
+                      ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                      : "border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                   }`}
                 />
               </div>
               {errors.email && (
-                <p className="text-red-500 text-sm mt-2 flex items-center gap-1">
+                <p className="text-red-600 text-sm mt-2 flex items-center gap-1">
                   <svg
                     className="w-4 h-4"
                     fill="currentColor"
@@ -167,13 +164,13 @@ const Login = () => {
             <div>
               <label
                 htmlFor="password"
-                className="mb-2 block text-xs font-medium uppercase tracking-[0.08em] text-slate-400"
+                className="mb-2 block text-sm font-medium text-slate-700"
               >
                 Password
               </label>
               <div className="relative">
                 <svg
-                  className="absolute left-3 top-3.5 w-5 h-5 text-slate-500"
+                  className="absolute left-3 top-3.5 w-5 h-5 text-slate-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -192,15 +189,15 @@ const Login = () => {
                   value={password}
                   onChange={handlePasswordChange}
                   placeholder="••••••••"
-                  className={`w-full rounded-xl border bg-slate-900/40 px-4 py-3 pl-11 font-medium text-slate-100 placeholder:text-slate-500 transition-all duration-300 focus:outline-none ${
+                  className={`w-full rounded-lg border bg-white px-4 py-3 pl-11 text-sm text-slate-900 placeholder:text-slate-400 transition-all duration-200 focus:outline-none ${
                     errors.password
-                      ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-200"
-                      : "border-white/10 focus:border-indigo-400 focus:ring-2 focus:ring-cyan-400/35"
+                      ? "border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                      : "border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                   }`}
                 />
               </div>
               {errors.password && (
-                <p className="text-red-500 text-sm mt-2 flex items-center gap-1">
+                <p className="text-red-600 text-sm mt-2 flex items-center gap-1">
                   <svg
                     className="w-4 h-4"
                     fill="currentColor"
@@ -221,7 +218,7 @@ const Login = () => {
             <div className="flex justify-end">
               <a
                 href="#"
-                className="text-sm font-medium text-indigo-300 transition-colors hover:text-cyan-300"
+                className="text-sm font-medium text-indigo-600 transition-colors hover:text-indigo-700"
               >
                 Forgot password?
               </a>
@@ -230,7 +227,7 @@ const Login = () => {
             {/* Login Button */}
             <button
               type="submit"
-              className="w-full rounded-full bg-linear-to-r from-indigo-600 to-violet-600 px-4 py-3 text-sm font-medium text-white shadow-[0_12px_28px_rgba(99,102,241,0.35)] transition-all duration-300 hover:-translate-y-px hover:shadow-[0_14px_30px_rgba(34,211,238,0.28)]"
+              className="w-full rounded-lg bg-indigo-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-indigo-600 hover:shadow-md"
             >
               Sign In
             </button>
@@ -239,17 +236,17 @@ const Login = () => {
           {/* Divider */}
           <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10"></div>
+              <div className="w-full border-t border-slate-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-slate-900/30 text-slate-500">or</span>
+              <span className="px-3 bg-white text-slate-400">or</span>
             </div>
           </div>
 
           <button
             type="button"
             onClick={handleGoogleLogin}
-            className="flex w-full items-center justify-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-3 text-sm font-medium text-slate-100 transition-all duration-300 hover:-translate-y-px hover:border-cyan-300/45 hover:bg-white/10"
+            className="flex w-full items-center justify-center gap-3 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-slate-50 hover:border-slate-400 hover:shadow-sm"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
               <path
@@ -273,11 +270,11 @@ const Login = () => {
           </button>
 
           {/* Signup Link Section */}
-          <div className="text-center">
-            <p className="text-slate-300 text-sm">
+          <div className="mt-6 text-center">
+            <p className="text-slate-600 text-sm">
               Don't have an account?{" "}
               <Link to="/signup">
-                <span className="cursor-pointer font-semibold text-indigo-300 transition-colors hover:text-cyan-300">
+                <span className="cursor-pointer font-semibold text-indigo-600 transition-colors hover:text-indigo-700">
                   Create an account
                 </span>
               </Link>
@@ -286,18 +283,18 @@ const Login = () => {
         </div>
 
         {/* Footer */}
-        <p className="mt-8 text-center text-xs text-slate-500">
+        <p className="mt-8 text-center text-xs text-slate-400">
           By signing in, you agree to our{" "}
           <a
             href="#"
-            className="text-indigo-300 hover:text-cyan-300 hover:underline"
+            className="text-indigo-600 hover:text-indigo-700 hover:underline"
           >
             Terms
           </a>{" "}
           and{" "}
           <a
             href="#"
-            className="text-indigo-300 hover:text-cyan-300 hover:underline"
+            className="text-indigo-600 hover:text-indigo-700 hover:underline"
           >
             Privacy Policy
           </a>

@@ -70,9 +70,9 @@ const getScoreMeta = (score) => {
   if (safe >= 7.5) {
     return {
       label: "Strong",
-      badgeClass: "border-emerald-300/30 bg-emerald-400/15 text-emerald-100",
-      textClass: "text-emerald-300",
-      fillClass: "bg-emerald-400",
+      badgeClass: "border-emerald-200 bg-emerald-50 text-emerald-700",
+      textClass: "text-emerald-600",
+      fillClass: "bg-emerald-500",
       icon: CheckCircle2,
     };
   }
@@ -80,18 +80,18 @@ const getScoreMeta = (score) => {
   if (safe >= 5) {
     return {
       label: "Average",
-      badgeClass: "border-amber-300/30 bg-amber-400/15 text-amber-100",
-      textClass: "text-amber-300",
-      fillClass: "bg-amber-400",
+      badgeClass: "border-amber-200 bg-amber-50 text-amber-700",
+      textClass: "text-amber-600",
+      fillClass: "bg-amber-500",
       icon: CircleAlert,
     };
   }
 
   return {
     label: "Needs improvement",
-    badgeClass: "border-rose-300/30 bg-rose-400/15 text-rose-100",
-    textClass: "text-rose-300",
-    fillClass: "bg-rose-400",
+    badgeClass: "border-red-200 bg-red-50 text-red-700",
+    textClass: "text-red-600",
+    fillClass: "bg-red-500",
     icon: CircleAlert,
   };
 };
@@ -104,7 +104,7 @@ const getPerformanceCopy = (score) => {
       line: "Outstanding Performance",
       tagline:
         "Excellent interview quality with strong consistency across answers.",
-      className: "text-emerald-300",
+      className: "text-emerald-600",
     };
   }
 
@@ -112,7 +112,7 @@ const getPerformanceCopy = (score) => {
     return {
       line: "Good Performance",
       tagline: "Solid baseline with room to sharpen depth and clarity.",
-      className: "text-amber-300",
+      className: "text-amber-600",
     };
   }
 
@@ -120,24 +120,24 @@ const getPerformanceCopy = (score) => {
     line: "Needs Improvement",
     tagline:
       "Focus on fundamentals and structured responses in your next practice.",
-    className: "text-rose-300",
+    className: "text-red-600",
   };
 };
 
 function SkeletonReport() {
   return (
     <section className="mx-auto mt-6 max-w-6xl animate-pulse px-4 pb-14 sm:px-6 lg:px-8">
-      <div className="h-30 rounded-3xl border border-white/10 bg-white/5" />
+      <div className="h-30 rounded-2xl border border-slate-200 bg-slate-50" />
       <div className="mt-5 grid gap-4 lg:grid-cols-3">
-        <div className="h-36 rounded-2xl border border-white/10 bg-white/5 lg:col-span-2" />
-        <div className="h-36 rounded-2xl border border-white/10 bg-white/5" />
+        <div className="h-36 rounded-xl border border-slate-200 bg-slate-50 lg:col-span-2" />
+        <div className="h-36 rounded-xl border border-slate-200 bg-slate-50" />
       </div>
       <div className="mt-5 grid gap-4 md:grid-cols-3">
-        <div className="h-34 rounded-2xl border border-white/10 bg-white/5" />
-        <div className="h-34 rounded-2xl border border-white/10 bg-white/5" />
-        <div className="h-34 rounded-2xl border border-white/10 bg-white/5" />
+        <div className="h-34 rounded-xl border border-slate-200 bg-slate-50" />
+        <div className="h-34 rounded-xl border border-slate-200 bg-slate-50" />
+        <div className="h-34 rounded-xl border border-slate-200 bg-slate-50" />
       </div>
-      <div className="mt-5 h-82 rounded-3xl border border-white/10 bg-white/5" />
+      <div className="mt-5 h-82 rounded-2xl border border-slate-200 bg-slate-50" />
     </section>
   );
 }
@@ -154,40 +154,37 @@ function HeaderCard({
   const ScoreIcon = scoreMeta.icon;
 
   return (
-    <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-linear-to-br from-slate-900/90 via-slate-900/75 to-cyan-950/45 p-6 shadow-[0_24px_65px_rgba(2,6,23,0.45)] backdrop-blur-xl sm:p-8">
-      <div className="pointer-events-none absolute -right-14 -top-14 h-48 w-48 rounded-full bg-cyan-400/20 blur-3xl" />
-      <div className="pointer-events-none absolute -left-16 top-14 h-40 w-40 rounded-full bg-violet-500/18 blur-3xl" />
-
-      <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+    <header className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <p className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-cyan-200">
+          <p className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-indigo-600">
             <Sparkles className="h-3.5 w-3.5" />
             Interview Report
           </p>
 
-          <h2 className="mt-4 text-2xl font-semibold text-slate-100 sm:text-3xl">
+          <h2 className="mt-4 text-2xl font-bold text-slate-900 sm:text-3xl">
             {candidateName}
           </h2>
-          <p className="mt-2 text-sm text-slate-300 sm:text-base">{role}</p>
+          <p className="mt-2 text-sm text-slate-600 sm:text-base">{role}</p>
 
-          <div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-slate-300 sm:text-sm">
-            <span className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5">
-              <CalendarDays className="h-4 w-4 text-cyan-300" />
+          <div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-slate-600 sm:text-sm">
+            <span className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5">
+              <CalendarDays className="h-4 w-4 text-indigo-500" />
               {dateLabel}
             </span>
-            <span className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5">
-              <Clock3 className="h-4 w-4 text-cyan-300" />
+            <span className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5">
+              <Clock3 className="h-4 w-4 text-indigo-500" />
               {durationLabel}
             </span>
           </div>
         </div>
 
-        <div className="min-w-50 rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
-          <p className="text-xs font-medium uppercase tracking-[0.08em] text-slate-400">
+        <div className="min-w-50 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+          <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
             Final Score
           </p>
           <div className="mt-2 flex items-center gap-3">
-            <p className="text-5xl font-semibold text-slate-100">
+            <p className="text-5xl font-bold text-slate-900">
               {clampScore(finalScore).toFixed(1)}
             </p>
             <p className="text-sm text-slate-400">/ 10</p>
@@ -199,11 +196,11 @@ function HeaderCard({
             {scoreMeta.label}
           </span>
 
-          <div className="mt-3 rounded-xl border border-white/10 bg-slate-950/45 p-3">
+          <div className="mt-3 rounded-lg border border-slate-200 bg-white p-3">
             <p className={`text-sm font-semibold ${performanceCopy.className}`}>
               {performanceCopy.line}
             </p>
-            <p className="mt-1 text-xs leading-5 text-slate-300">
+            <p className="mt-1 text-xs leading-5 text-slate-600">
               {performanceCopy.tagline}
             </p>
           </div>
@@ -219,10 +216,10 @@ function SkillCard({ title, icon: Icon, score }) {
   const progressWidth = `${(safeScore / SAFE_SCORE_MAX) * 100}%`;
 
   return (
-    <article className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
+    <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex items-center justify-between gap-3">
-        <h4 className="inline-flex items-center gap-2 text-sm font-semibold text-slate-100 sm:text-base">
-          <Icon className="h-5 w-5 text-cyan-300" />
+        <h4 className="inline-flex items-center gap-2 text-sm font-semibold text-slate-900 sm:text-base">
+          <Icon className="h-5 w-5 text-indigo-500" />
           {title}
         </h4>
         <span className={`text-sm font-semibold ${scoreMeta.textClass}`}>
@@ -230,7 +227,7 @@ function SkillCard({ title, icon: Icon, score }) {
         </span>
       </div>
 
-      <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-white/10">
+      <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
         <div
           className={`h-full rounded-full ${scoreMeta.fillClass} transition-all duration-700`}
           style={{ width: progressWidth }}
@@ -248,9 +245,9 @@ function SkillCard({ title, icon: Icon, score }) {
 
 function PerformanceChart({ data }) {
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl sm:p-6">
-      <h3 className="flex items-center gap-2 text-lg font-semibold text-slate-100">
-        <TrendingUp className="h-5 w-5 text-cyan-300" />
+    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <h3 className="flex items-center gap-2 text-lg font-bold text-slate-900">
+        <TrendingUp className="h-5 w-5 text-indigo-500" />
         Question Score Trend
       </h3>
 
@@ -262,33 +259,34 @@ function PerformanceChart({ data }) {
           >
             <defs>
               <linearGradient id="scoreFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.45} />
-                <stop offset="95%" stopColor="#22d3ee" stopOpacity={0.04} />
+                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="#6366f1" stopOpacity={0.02} />
               </linearGradient>
             </defs>
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="rgba(148,163,184,0.22)"
+              stroke="#e2e8f0"
             />
             <XAxis
               dataKey="label"
-              tick={{ fill: "#cbd5e1", fontSize: 12 }}
+              tick={{ fill: "#64748b", fontSize: 12 }}
               tickLine={false}
-              axisLine={{ stroke: "rgba(148,163,184,0.25)" }}
+              axisLine={{ stroke: "#e2e8f0" }}
             />
             <YAxis
               domain={[0, 10]}
-              tick={{ fill: "#cbd5e1", fontSize: 12 }}
+              tick={{ fill: "#64748b", fontSize: 12 }}
               tickLine={false}
-              axisLine={{ stroke: "rgba(148,163,184,0.25)" }}
+              axisLine={{ stroke: "#e2e8f0" }}
             />
             <Tooltip
-              cursor={{ stroke: "rgba(56,189,248,0.4)", strokeWidth: 1 }}
+              cursor={{ stroke: "#6366f1", strokeWidth: 1, strokeOpacity: 0.3 }}
               contentStyle={{
-                background: "rgba(15, 23, 42, 0.95)",
-                border: "1px solid rgba(148,163,184,0.22)",
+                background: "#ffffff",
+                border: "1px solid #e2e8f0",
                 borderRadius: "12px",
-                color: "#e2e8f0",
+                color: "#0f172a",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
               }}
               formatter={(value) => [
                 `${Number(value).toFixed(1)} / 10`,
@@ -298,13 +296,13 @@ function PerformanceChart({ data }) {
             <Area
               type="monotone"
               dataKey="score"
-              stroke="#22d3ee"
+              stroke="#6366f1"
               strokeWidth={2.2}
               fill="url(#scoreFill)"
               activeDot={{
                 r: 5,
-                fill: "#06b6d4",
-                stroke: "#cffafe",
+                fill: "#6366f1",
+                stroke: "#c7d2fe",
                 strokeWidth: 2,
               }}
             />
@@ -322,17 +320,17 @@ function QuestionCard({ question, index }) {
   const ScoreIcon = scoreMeta.icon;
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl transition-all duration-300 hover:border-cyan-300/25">
+    <article className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:border-indigo-200">
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         className="flex w-full items-start justify-between gap-4 px-4 py-4 text-left sm:px-5"
       >
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
             Question {index + 1}
           </p>
-          <h4 className="mt-1 text-sm leading-6 text-slate-100 sm:text-base">
+          <h4 className="mt-1 text-sm leading-6 text-slate-900 sm:text-base">
             {question?.question || "Question text not available"}
           </h4>
         </div>
@@ -345,40 +343,40 @@ function QuestionCard({ question, index }) {
             {score.toFixed(1)}
           </span>
           {isOpen ? (
-            <ChevronUp className="h-4 w-4 text-slate-300" />
+            <ChevronUp className="h-4 w-4 text-slate-400" />
           ) : (
-            <ChevronDown className="h-4 w-4 text-slate-300" />
+            <ChevronDown className="h-4 w-4 text-slate-400" />
           )}
         </div>
       </button>
 
       {isOpen && (
-        <div className="border-t border-white/10 px-4 pb-4 pt-3 sm:px-5 sm:pt-4">
-          <div className="grid gap-3 text-sm text-slate-300 sm:grid-cols-2">
-            <div className="rounded-xl border border-white/10 bg-slate-950/40 p-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">
+        <div className="border-t border-slate-200 px-4 pb-4 pt-3 sm:px-5 sm:pt-4">
+          <div className="grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Candidate Answer
               </p>
-              <p className="mt-2 leading-6 text-slate-200">
+              <p className="mt-2 leading-6 text-slate-700">
                 {question?.answer?.trim() || "Answer not submitted"}
               </p>
             </div>
 
-            <div className="rounded-xl border border-white/10 bg-slate-950/40 p-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                 AI Feedback
               </p>
-              <p className="mt-2 leading-6 text-slate-200">
+              <p className="mt-2 leading-6 text-slate-700">
                 {question?.feedback?.trim() || "Feedback not available"}
               </p>
             </div>
           </div>
 
           <div className="mt-3 flex flex-wrap gap-2 text-xs">
-            <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-slate-300">
+            <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-600">
               Difficulty: {toTitle(question?.difficulty)}
             </span>
-            <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-slate-300">
+            <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-600">
               Type: {toTitle(question?.questionType)}
             </span>
           </div>
@@ -391,38 +389,38 @@ function QuestionCard({ question, index }) {
 function AdditionalInsights({ averageScore, bestQuestion, weakestQuestion }) {
   return (
     <section className="grid gap-4 md:grid-cols-3">
-      <article className="rounded-2xl border border-cyan-300/20 bg-cyan-400/10 p-5 backdrop-blur-xl">
-        <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-cyan-100/90">
+      <article className="rounded-xl border border-indigo-200 bg-indigo-50 p-5">
+        <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-600">
           <Target className="h-4 w-4" />
           Average Score
         </p>
-        <p className="mt-2 text-3xl font-semibold text-cyan-100">
+        <p className="mt-2 text-3xl font-bold text-indigo-700">
           {clampScore(averageScore).toFixed(1)}
         </p>
       </article>
 
-      <article className="rounded-2xl border border-emerald-300/20 bg-emerald-400/10 p-5 backdrop-blur-xl">
-        <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-emerald-100/90">
+      <article className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
+        <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-600">
           <Trophy className="h-4 w-4" />
           Best Question
         </p>
-        <p className="mt-2 text-sm leading-6 text-emerald-50">
+        <p className="mt-2 text-sm leading-6 text-emerald-800">
           {bestQuestion?.question || "Not enough data"}
         </p>
-        <p className="mt-2 text-sm font-semibold text-emerald-100">
+        <p className="mt-2 text-sm font-semibold text-emerald-700">
           Score: {clampScore(bestQuestion?.score).toFixed(1)} / 10
         </p>
       </article>
 
-      <article className="rounded-2xl border border-amber-300/20 bg-amber-400/10 p-5 backdrop-blur-xl">
-        <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-amber-100/90">
+      <article className="rounded-xl border border-amber-200 bg-amber-50 p-5">
+        <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-600">
           <ShieldCheck className="h-4 w-4" />
           Weakest Question
         </p>
-        <p className="mt-2 text-sm leading-6 text-amber-50">
+        <p className="mt-2 text-sm leading-6 text-amber-800">
           {weakestQuestion?.question || "Not enough data"}
         </p>
-        <p className="mt-2 text-sm font-semibold text-amber-100">
+        <p className="mt-2 text-sm font-semibold text-amber-700">
           Score: {clampScore(weakestQuestion?.score).toFixed(1)} / 10
         </p>
       </article>
@@ -739,16 +737,13 @@ function Step3Report({ report }) {
   };
 
   return (
-    <section className="relative mx-auto mt-6 max-w-6xl px-4 pb-14 sm:px-6 lg:px-8">
-      <div className="pointer-events-none absolute -top-14 right-10 h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl" />
-      <div className="pointer-events-none absolute -left-16 top-52 h-72 w-72 rounded-full bg-violet-500/12 blur-3xl" />
-
-      <div className="relative z-10 space-y-5">
+    <section className="mx-auto mt-6 max-w-6xl px-4 pb-14 sm:px-6 lg:px-8">
+      <div className="space-y-5">
         <div className="flex justify-end">
           <button
             type="button"
             onClick={downloadPDF}
-            className="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-indigo-600 to-blue-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(59,130,246,0.28)] transition-all duration-300 hover:translate-y-px hover:shadow-[0_16px_34px_rgba(59,130,246,0.35)]"
+            className="inline-flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-indigo-600 hover:shadow-md"
           >
             <Download className="h-4 w-4" />
             Download Report
@@ -781,11 +776,11 @@ function Step3Report({ report }) {
           weakestQuestion={weakestQuestion}
         />
 
-        <section className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl sm:p-6">
-          <h3 className="text-lg font-semibold text-slate-100">
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <h3 className="text-lg font-bold text-slate-900">
             Question-wise Breakdown
           </h3>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm text-slate-500">
             Expand each card to review answer quality and actionable AI
             feedback.
           </p>
@@ -800,7 +795,7 @@ function Step3Report({ report }) {
                 />
               ))
             ) : (
-              <div className="rounded-2xl border border-white/10 bg-slate-950/35 p-5 text-sm text-slate-300">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-500">
                 Question-level data is not available for this report.
               </div>
             )}
