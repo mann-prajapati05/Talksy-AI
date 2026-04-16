@@ -3,6 +3,9 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import Timer from "./Timer";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -46,7 +49,6 @@ function Step2interview({ interviewData, onFinish }) {
   const [isIntroPhase, setIsIntroPhase] = useState(true);
 
   const [isMicOn, setIsMicOn] = useState(true);
-  const recongnitionRef = useRef(null);
   const [isAiPlaying, setIsAiPlaying] = useState(false);
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -65,6 +67,12 @@ function Step2interview({ interviewData, onFinish }) {
   const isRunningIntroRef = useRef(false);
 
   const currentQuestion = questions[currentIndex];
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
 
   const getPreferredVoice = () => {
     if (!window.speechSynthesis?.getVoices) return null;
@@ -260,29 +268,17 @@ function Step2interview({ interviewData, onFinish }) {
   }, [currentIndex, isIntroPhase]);
 
   useEffect(() => {
-    if (!("webkitSpeechRecognition" in window)) {
+    if (!browserSupportsSpeechRecognition) {
       console.log("we can't speak..");
       return;
     }
-
-    const recognition = new window.webkitSpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.continuous = true;
-    recognition.interimResults = false;
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[event.results.length - 1][0].transcript;
-
-      setAnswer((prev) => `${prev} ${transcript}`.trim());
-    };
-
-    recongnitionRef.current = recognition;
-  }, []);
+    setAnswer(transcript);
+  }, [transcript, browserSupportsSpeechRecognition]);
 
   const startMic = () => {
-    if (recongnitionRef.current && !isAiPlaying) {
+    if (!isAiPlaying) {
       try {
-        recongnitionRef.current.start();
+        SpeechRecognition.startListening({ continuous: true });
       } catch (err) {
         console.log(err);
       }
@@ -290,9 +286,7 @@ function Step2interview({ interviewData, onFinish }) {
   };
 
   const stopMic = () => {
-    if (recongnitionRef.current) {
-      recongnitionRef.current.stop();
-    }
+    SpeechRecognition.stopListening();
   };
 
   const toggleMic = () => {
@@ -333,6 +327,7 @@ function Step2interview({ interviewData, onFinish }) {
   const handleNext = async () => {
     setAnswer("");
     setFeedback("");
+    resetTranscript();
 
     if (currentIndex + 1 >= questions.length) {
       finishInterview();
@@ -374,16 +369,6 @@ function Step2interview({ interviewData, onFinish }) {
       handleSubmitAnswer();
     }
   }, [timeLeft]);
-
-  useEffect(() => {
-    return () => {
-      if (recongnitionRef.current) {
-        recongnitionRef.current.stop();
-        recongnitionRef.current.abort();
-      }
-      window.speechSynthesis.cancel();
-    };
-  }, []);
 
   return (
     <motion.section
