@@ -18,10 +18,11 @@ export const getCurrentUser = async(req,res)=>{
             credits:user.credits,
         });
     }catch(err){
+        console.log("Error finding user:", err.message, err.stack);
         return res.status(404).json({
                 success:false,
                 message:"something went wrong while finding user..",
-                err
+                error: err.message || String(err)
             }) 
     }
 }
