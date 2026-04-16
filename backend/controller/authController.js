@@ -25,9 +25,9 @@ export const login = async(req,res,next) =>{
         
         res.cookie("userToken",token,{
             httpOnly:true,
-            secure:process.env.NODE_ENV==='prod',
+            secure:process.env.NODE_ENV==='production',
             maxAge:2*24*3600000,
-            sameSite:'strict'
+            sameSite:process.env.NODE_ENV==="prodution"? 'none' :'strict'
         });
         console.log(token);
         return res.status(200).json({
@@ -121,7 +121,7 @@ export const signup=[
                 httpOnly:true,
                 secure:process.env.NODE_ENV==='prod',
                 maxAge:2*24*3600000,
-                sameSite:'strict'
+                sameSite:process.env.NODE_ENV==="prodution"? 'none' :'strict'
             });
             console.log(token);
             return res.status(201).json({
@@ -169,7 +169,7 @@ export const googleAuth = async(req,res,next) =>{
         httpOnly:true,
         secure:process.env.NODE_ENV==='prod',
         maxAge:2*24*3600000,
-        sameSite:'strict'
+        sameSite:process.env.NODE_ENV==="prodution"? 'none' :'strict'
     });
     
     console.log(token);
