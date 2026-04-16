@@ -67,35 +67,35 @@ const normalizeExtractedExperience = (rawExperience) => {
 };
 
 const containerVariants = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 16 },
   show: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.55,
+      duration: 0.4,
       ease: "easeOut",
       when: "beforeChildren",
-      staggerChildren: 0.1,
+      staggerChildren: 0.08,
     },
   },
 };
 
 const sectionVariants = {
-  hidden: { opacity: 0, y: 14 },
+  hidden: { opacity: 0, y: 10 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: "easeOut" },
+    transition: { duration: 0.3, ease: "easeOut" },
   },
 };
 
 function SectionLabel({ title, hint }) {
   return (
     <div className="mb-3 flex items-center justify-between gap-3">
-      <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
+      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
         {title}
       </p>
-      {hint ? <p className="text-xs text-slate-500">{hint}</p> : null}
+      {hint ? <p className="text-xs text-slate-400">{hint}</p> : null}
     </div>
   );
 }
@@ -103,14 +103,14 @@ function SectionLabel({ title, hint }) {
 function OptionButton({ active, label, onClick }) {
   return (
     <motion.button
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
       type="button"
       onClick={onClick}
-      className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-300 ${
+      className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
         active
-          ? "border-cyan-300/50 bg-linear-to-r from-indigo-600 to-violet-600 text-white shadow-[0_10px_28px_rgba(34,211,238,0.2)]"
-          : "border-white/10 bg-white/5 text-slate-200 hover:border-cyan-300/35 hover:bg-white/10"
+          ? "border-indigo-500 bg-indigo-50 text-indigo-700 shadow-sm"
+          : "border-slate-300 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50"
       }`}
     >
       {label}
@@ -268,20 +268,17 @@ function Step1Setup({ onStart }) {
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="relative min-h-screen overflow-hidden bg-linear-to-br from-slate-900 via-slate-900 to-slate-800 px-4 py-10 text-slate-100 sm:px-6"
+      className="min-h-screen bg-white px-4 py-10 text-slate-900 sm:px-6"
     >
-      <div className="pointer-events-none absolute -top-14 -left-16 h-64 w-64 rounded-full bg-violet-500/20 blur-3xl" />
-      <div className="pointer-events-none absolute -right-16 top-28 h-72 w-72 rounded-full bg-cyan-400/15 blur-3xl" />
-
-      <div className="relative mx-auto w-full max-w-4xl">
+      <div className="mx-auto w-full max-w-4xl">
         <motion.header variants={sectionVariants} className="mb-8 text-center">
-          <p className="inline-flex rounded-full border border-cyan-300/25 bg-cyan-400/10 px-4 py-1 text-xs font-medium tracking-[0.08em] text-cyan-200">
+          <p className="inline-flex rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1 text-xs font-semibold tracking-wide text-indigo-600">
             Step 1 of 3
           </p>
-          <h1 className="mt-4 text-3xl font-semibold text-slate-100 sm:text-4xl">
+          <h1 className="mt-4 text-3xl font-bold text-slate-900 sm:text-4xl">
             Setup Your Mock Interview
           </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-sm text-slate-300 sm:text-base">
+          <p className="mx-auto mt-3 max-w-2xl text-sm text-slate-600 sm:text-base">
             Configure your target role, interview focus, and optionally let AI
             read your resume to personalize the session.
           </p>
@@ -289,15 +286,13 @@ function Step1Setup({ onStart }) {
 
         <motion.div
           variants={sectionVariants}
-          className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 shadow-[0_26px_70px_rgba(2,6,23,0.5)] backdrop-blur-xl sm:p-8"
+          className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
         >
-          <div className="pointer-events-none absolute -top-20 right-0 h-48 w-48 rounded-full bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.18),transparent_70%)]" />
-
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="relative z-10 space-y-7"
+            className="space-y-7"
           >
             <motion.div variants={sectionVariants}>
               <SectionLabel title="Role" hint="Job profile you are targeting" />
@@ -306,7 +301,7 @@ function Step1Setup({ onStart }) {
                 value={role}
                 onChange={(event) => setRole(event.target.value)}
                 placeholder="e.g. Frontend Developer"
-                className="w-full rounded-xl border border-white/10 bg-slate-900/40 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition-all duration-300 focus:border-cyan-300/45 focus:ring-2 focus:ring-cyan-300/20"
+                className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
               />
             </motion.div>
 
@@ -360,7 +355,7 @@ function Step1Setup({ onStart }) {
 
             <motion.div
               variants={sectionVariants}
-              className="rounded-2xl border border-white/10 bg-slate-900/35 p-4 sm:p-5"
+              className="rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-5"
             >
               <SectionLabel
                 title="Resume Analysis"
@@ -380,10 +375,10 @@ function Step1Setup({ onStart }) {
                   setDragActive(false);
                 }}
                 onDrop={handleDrop}
-                className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed px-4 py-7 text-center transition-all duration-300 ${
+                className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-4 py-7 text-center transition-all duration-200 ${
                   dragActive
-                    ? "border-cyan-300/55 bg-cyan-400/10"
-                    : "border-white/20 bg-white/5 hover:border-cyan-300/35 hover:bg-white/10"
+                    ? "border-indigo-400 bg-indigo-50"
+                    : "border-slate-300 bg-white hover:border-indigo-400 hover:bg-indigo-50/30"
                 }`}
               >
                 <input
@@ -392,7 +387,7 @@ function Step1Setup({ onStart }) {
                   className="hidden"
                   onChange={handleFileChange}
                 />
-                <p className="text-sm font-medium text-slate-100">
+                <p className="text-sm font-medium text-slate-700">
                   Drop your resume here or click to upload
                 </p>
                 <p className="mt-1 text-xs text-slate-400">
@@ -408,19 +403,19 @@ function Step1Setup({ onStart }) {
                     exit={{ opacity: 0, y: 8 }}
                     className="mt-4 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between"
                   >
-                    <p className="text-sm text-slate-300">
+                    <p className="text-sm text-slate-600">
                       Selected:{" "}
-                      <span className="font-medium text-cyan-200">
+                      <span className="font-medium text-slate-900">
                         {resumeFile.name}
                       </span>
                     </p>
                     <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
                       type="button"
                       onClick={handleUploadResume}
                       disabled={analyzing}
-                      className="rounded-full bg-linear-to-r from-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(99,102,241,0.35)] transition-all duration-300 hover:shadow-[0_16px_34px_rgba(34,211,238,0.28)] disabled:cursor-not-allowed disabled:opacity-65"
+                      className="rounded-lg bg-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-indigo-600 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {analyzing ? "Analyzing resume..." : "Analyze Resume"}
                     </motion.button>
@@ -434,15 +429,15 @@ function Step1Setup({ onStart }) {
                     initial={{ opacity: 0, height: 0, marginTop: 0 }}
                     animate={{ opacity: 1, height: "auto", marginTop: 20 }}
                     exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                    transition={{ duration: 0.35, ease: "easeOut" }}
-                    className="overflow-hidden rounded-xl border border-cyan-300/20 bg-cyan-400/5 p-4"
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="overflow-hidden rounded-xl border border-indigo-200 bg-indigo-50/50 p-4"
                   >
-                    <p className="text-xs font-semibold uppercase tracking-[0.09em] text-cyan-200">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-indigo-600">
                       AI Extracted Profile
                     </p>
 
                     <div className="mt-3">
-                      <p className="text-xs uppercase tracking-[0.08em] text-slate-400">
+                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
                         Experience
                       </p>
                       <div className="mt-2 space-y-2">
@@ -450,32 +445,32 @@ function Step1Setup({ onStart }) {
                           extractedExperience.map((item, index) => (
                             <div
                               key={`experience-${index}`}
-                              className="rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-slate-200"
+                              className="rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-700"
                             >
                               <div className="grid gap-2 sm:grid-cols-2">
                                 <p>
-                                  <span className="text-slate-400">
+                                  <span className="text-slate-500">
                                     Company:{" "}
                                   </span>
                                   {item.company || "Not specified"}
                                 </p>
                                 <p>
-                                  <span className="text-slate-400">Type: </span>
+                                  <span className="text-slate-500">Type: </span>
                                   {item.type || "Not specified"}
                                 </p>
                                 <p>
-                                  <span className="text-slate-400">Mode: </span>
+                                  <span className="text-slate-500">Mode: </span>
                                   {item.mode || "Not specified"}
                                 </p>
                                 <p>
-                                  <span className="text-slate-400">
+                                  <span className="text-slate-500">
                                     Employment:{" "}
                                   </span>
                                   {item.employment || "Not specified"}
                                 </p>
                               </div>
-                              <p className="mt-2 text-slate-300">
-                                <span className="text-slate-400">
+                              <p className="mt-2 text-slate-600">
+                                <span className="text-slate-500">
                                   Description:{" "}
                                 </span>
                                 {item.description || "Not specified"}
@@ -491,7 +486,7 @@ function Step1Setup({ onStart }) {
                     </div>
 
                     <div className="mt-3">
-                      <p className="text-xs uppercase tracking-[0.08em] text-slate-400">
+                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
                         Skills
                       </p>
                       <div className="mt-2 flex flex-wrap gap-2">
@@ -499,7 +494,7 @@ function Step1Setup({ onStart }) {
                           skills.map((skill, index) => (
                             <span
                               key={`${skill}-${index}`}
-                              className="rounded-full border border-cyan-300/35 bg-cyan-400/10 px-3 py-1 text-xs font-medium text-cyan-100"
+                              className="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700"
                             >
                               {skill}
                             </span>
@@ -513,7 +508,7 @@ function Step1Setup({ onStart }) {
                     </div>
 
                     <div className="mt-4">
-                      <p className="text-xs uppercase tracking-[0.08em] text-slate-400">
+                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
                         Projects
                       </p>
                       <div className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -521,7 +516,7 @@ function Step1Setup({ onStart }) {
                           projects.map((project, index) => (
                             <div
                               key={`${project}-${index}`}
-                              className="rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-slate-200"
+                              className="rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-700"
                             >
                               {project}
                             </div>
@@ -535,11 +530,11 @@ function Step1Setup({ onStart }) {
                     </div>
 
                     {resumeText ? (
-                      <div className="mt-4 rounded-lg border border-white/10 bg-slate-900/35 p-3">
-                        <p className="text-xs uppercase tracking-[0.08em] text-slate-400">
+                      <div className="mt-4 rounded-lg border border-slate-200 bg-white p-3">
+                        <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
                           Resume Snapshot
                         </p>
-                        <p className="mt-2 max-h-24 overflow-hidden text-sm text-slate-300">
+                        <p className="mt-2 max-h-24 overflow-hidden text-sm text-slate-600">
                           {resumeText}
                         </p>
                       </div>
@@ -551,15 +546,15 @@ function Step1Setup({ onStart }) {
 
             <motion.div variants={sectionVariants} className="pt-1">
               {hasInsufficientCredits && (
-                <div className="mb-3 rounded-xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-center">
-                  <p className="text-xs font-semibold tracking-wide text-amber-100 sm:text-sm">
+                <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-center">
+                  <p className="text-xs font-semibold text-amber-800 sm:text-sm">
                     Need at least 20 credits to start interview. You currently
                     have {userCredits}.
                   </p>
                   <button
                     type="button"
                     onClick={() => navigate("/pricing")}
-                    className="mt-2 rounded-full bg-linear-to-r from-amber-400 to-orange-500 px-4 py-2 text-xs font-semibold text-slate-900 shadow-[0_10px_22px_rgba(251,146,60,0.28)] transition hover:brightness-105"
+                    className="mt-2 rounded-lg bg-amber-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-200 hover:bg-amber-600"
                   >
                     Buy Credits
                   </button>
@@ -567,18 +562,18 @@ function Step1Setup({ onStart }) {
               )}
 
               {creditError && !hasInsufficientCredits ? (
-                <p className="mb-3 text-center text-xs font-medium text-amber-200">
+                <p className="mb-3 text-center text-xs font-medium text-amber-700">
                   {creditError}
                 </p>
               ) : null}
 
               <motion.button
-                whileHover={{ scale: canStart ? 1.015 : 1 }}
-                whileTap={{ scale: canStart ? 0.985 : 1 }}
+                whileHover={{ scale: canStart ? 1.01 : 1 }}
+                whileTap={{ scale: canStart ? 0.99 : 1 }}
                 type="button"
                 onClick={handleStartInterview}
                 disabled={!canStart || loading || hasInsufficientCredits}
-                className="w-full rounded-full bg-linear-to-r from-indigo-600 to-violet-600 px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_36px_rgba(99,102,241,0.35)] transition-all duration-300 hover:shadow-[0_18px_40px_rgba(34,211,238,0.28)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full rounded-lg bg-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-indigo-600 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? "Starting..." : "Start Interview"}
               </motion.button>

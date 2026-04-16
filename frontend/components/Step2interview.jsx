@@ -9,36 +9,36 @@ import SpeechRecognition, {
 import { serverUrl } from "../routes/App";
 
 const pageVariants = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 16 },
   show: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.55,
+      duration: 0.4,
       ease: "easeOut",
       when: "beforeChildren",
-      staggerChildren: 0.08,
+      staggerChildren: 0.06,
     },
   },
 };
 
 const panelVariants = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 12 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.45, ease: "easeOut" },
+    transition: { duration: 0.35, ease: "easeOut" },
   },
 };
 
 const questionVariants = {
-  initial: { opacity: 0, x: 36 },
+  initial: { opacity: 0, x: 24 },
   animate: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.45, ease: "easeOut" },
+    transition: { duration: 0.35, ease: "easeOut" },
   },
-  exit: { opacity: 0, x: -24, transition: { duration: 0.28, ease: "easeIn" } },
+  exit: { opacity: 0, x: -16, transition: { duration: 0.2, ease: "easeIn" } },
 };
 
 function Step2interview({ interviewData, onFinish }) {
@@ -376,30 +376,24 @@ function Step2interview({ interviewData, onFinish }) {
       variants={pageVariants}
       initial="hidden"
       animate="show"
-      className="relative min-h-screen overflow-hidden bg-linear-to-br from-slate-900 via-slate-900 to-slate-800 px-4 py-6 text-slate-100 sm:px-6 lg:px-8"
+      className="min-h-screen bg-slate-50 px-4 py-6 text-slate-900 sm:px-6 lg:px-8"
     >
-      <div className="pointer-events-none absolute -top-20 -left-20 h-72 w-72 rounded-full bg-violet-500/15 blur-3xl" />
-      <div className="pointer-events-none absolute right-0 top-32 h-80 w-80 rounded-full bg-cyan-400/12 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-0 left-1/2 h-56 w-[32rem] -translate-x-1/2 rounded-full bg-indigo-500/10 blur-3xl" />
-
-      <div className="relative mx-auto grid w-full max-w-7xl gap-6 lg:grid-cols-[1.05fr_1fr]">
+      <div className="mx-auto grid w-full max-w-7xl gap-6 lg:grid-cols-[1.05fr_1fr]">
         <motion.aside
           variants={panelVariants}
-          className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5 shadow-[0_25px_70px_rgba(2,6,23,0.5)] backdrop-blur-xl sm:p-6"
+          className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
         >
-          <div className="pointer-events-none absolute -right-10 -top-12 h-44 w-44 rounded-full bg-cyan-400/12 blur-2xl" />
-
-          <div className="relative z-10 flex h-full flex-col gap-5">
+          <div className="flex h-full flex-col gap-5">
             <div className="flex items-center justify-between">
-              <p className="rounded-full border border-cyan-300/35 bg-cyan-400/10 px-3 py-1 text-xs font-medium tracking-[0.08em] text-cyan-200">
+              <p className="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-semibold tracking-wide text-indigo-600">
                 LIVE AI INTERVIEWER
               </p>
-              <div className="flex items-center gap-2 text-xs text-slate-300">
+              <div className="flex items-center gap-2 text-xs text-slate-500">
                 <span
-                  className={`h-2.5 w-2.5 rounded-full ${
+                  className={`h-2 w-2 rounded-full ${
                     isAiPlaying
-                      ? "bg-cyan-300 shadow-[0_0_14px_rgba(34,211,238,0.9)]"
-                      : "bg-slate-500"
+                      ? "bg-indigo-500 shadow-sm"
+                      : "bg-slate-300"
                   }`}
                 />
                 <span>{isAiPlaying ? "Speaking" : "Listening"}</span>
@@ -407,7 +401,7 @@ function Step2interview({ interviewData, onFinish }) {
             </div>
 
             <motion.div
-              animate={{ y: [0, -8, 0] }}
+              animate={{ y: [0, -4, 0] }}
               transition={{
                 repeat: Infinity,
                 duration: 5.2,
@@ -415,24 +409,7 @@ function Step2interview({ interviewData, onFinish }) {
               }}
               className="relative mx-auto w-full max-w-md"
             >
-              <motion.div
-                animate={
-                  isAiPlaying || questionPulse
-                    ? {
-                        opacity: [0.35, 0.85, 0.35],
-                        scale: [0.98, 1.05, 0.98],
-                      }
-                    : { opacity: 0.3, scale: 1 }
-                }
-                transition={{
-                  duration: 1.8,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="pointer-events-none absolute inset-[-14px] rounded-2xl bg-linear-to-r from-indigo-500/30 via-violet-500/20 to-cyan-400/30 blur-xl"
-              />
-
-              <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-slate-950/60 shadow-[0_18px_45px_rgba(15,23,42,0.75)]">
+              <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-900 shadow-sm">
                 <video
                   src={voiceGender == "female" ? femaleVideo : maleVideo}
                   muted
@@ -443,7 +420,7 @@ function Step2interview({ interviewData, onFinish }) {
                 />
 
                 {isAiPlaying && (
-                  <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-end gap-1.5 rounded-full border border-cyan-300/35 bg-slate-900/65 px-3 py-1.5 backdrop-blur">
+                  <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-end gap-1.5 rounded-full border border-white/20 bg-slate-900/70 px-3 py-1.5 backdrop-blur-sm">
                     {[0, 1, 2, 3, 4].map((bar) => (
                       <motion.span
                         key={bar}
@@ -454,7 +431,7 @@ function Step2interview({ interviewData, onFinish }) {
                           delay: bar * 0.1,
                           ease: "easeInOut",
                         }}
-                        className="w-1 rounded-full bg-cyan-300"
+                        className="w-1 rounded-full bg-indigo-400"
                       />
                     ))}
                   </div>
@@ -462,16 +439,16 @@ function Step2interview({ interviewData, onFinish }) {
               </div>
             </motion.div>
 
-            <div className="min-h-16 rounded-xl border border-white/10 bg-slate-900/45 p-3 text-center">
+            <div className="min-h-16 rounded-lg border border-slate-200 bg-slate-50 p-3 text-center">
               <AnimatePresence mode="wait">
                 {subtitle ? (
                   <motion.p
                     key={subtitle}
-                    initial={{ opacity: 0, y: 12 }}
+                    initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="text-sm leading-relaxed text-slate-100 sm:text-base"
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                    className="text-sm leading-relaxed text-slate-700 sm:text-base"
                   >
                     {subtitle}
                   </motion.p>
@@ -479,10 +456,10 @@ function Step2interview({ interviewData, onFinish }) {
                   isAiPlaying && (
                     <motion.p
                       key="thinking"
-                      initial={{ opacity: 0, y: 8 }}
+                      initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -4 }}
-                      className="text-sm text-cyan-200"
+                      className="text-sm text-indigo-600"
                     >
                       Thinking...
                     </motion.p>
@@ -491,11 +468,11 @@ function Step2interview({ interviewData, onFinish }) {
               </AnimatePresence>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-slate-900/45 p-4">
-              <div className="mb-3 flex items-center justify-between text-xs tracking-[0.08em] text-slate-400 uppercase">
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <div className="mb-3 flex items-center justify-between text-xs font-medium uppercase tracking-wider text-slate-400">
                 <span>Interview Status</span>
                 <span
-                  className={isAiPlaying ? "text-cyan-200" : "text-slate-400"}
+                  className={isAiPlaying ? "text-indigo-600" : "text-slate-400"}
                 >
                   {isAiPlaying ? "AI speaking" : "Awaiting response"}
                 </span>
@@ -511,19 +488,19 @@ function Step2interview({ interviewData, onFinish }) {
                   </div>
 
                   <div className="grid flex-1 grid-cols-2 gap-3">
-                    <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-center">
-                      <p className="text-xl font-semibold text-white">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center">
+                      <p className="text-xl font-bold text-slate-900">
                         {currentIndex + 1}
                       </p>
-                      <p className="text-[11px] tracking-[0.08em] text-slate-400 uppercase">
+                      <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
                         Current
                       </p>
                     </div>
-                    <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-center">
-                      <p className="text-xl font-semibold text-white">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center">
+                      <p className="text-xl font-bold text-slate-900">
                         {questions.length}
                       </p>
-                      <p className="text-[11px] tracking-[0.08em] text-slate-400 uppercase">
+                      <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
                         Total
                       </p>
                     </div>
@@ -536,24 +513,22 @@ function Step2interview({ interviewData, onFinish }) {
 
         <motion.main
           variants={panelVariants}
-          className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5 shadow-[0_25px_70px_rgba(2,6,23,0.5)] backdrop-blur-xl sm:p-7"
+          className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
         >
-          <div className="pointer-events-none absolute -left-16 top-28 h-56 w-56 rounded-full bg-indigo-500/12 blur-3xl" />
-
           <motion.div
             variants={pageVariants}
             initial="hidden"
             animate="show"
-            className="relative z-10 flex h-full flex-col gap-5"
+            className="flex h-full flex-col gap-5"
           >
             <div>
-              <p className="text-xs tracking-[0.12em] text-slate-400 uppercase">
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
                 Step 2 of 3
               </p>
-              <h2 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">
+              <h2 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
                 AI Smart Interview
               </h2>
-              <p className="mt-1 text-sm text-slate-300">
+              <p className="mt-1 text-sm text-slate-600">
                 Answer clearly and confidently. Your response will be reviewed
                 in real-time.
               </p>
@@ -567,12 +542,12 @@ function Step2interview({ interviewData, onFinish }) {
                   initial="initial"
                   animate="animate"
                   exit="exit"
-                  className="rounded-2xl border border-indigo-300/25 bg-linear-to-br from-slate-900/70 to-slate-900/50 p-5 shadow-[0_0_0_1px_rgba(165,180,252,0.1),0_24px_45px_rgba(15,23,42,0.4)]"
+                  className="rounded-xl border border-indigo-200 bg-indigo-50 p-5"
                 >
-                  <p className="mb-2 text-xs font-medium tracking-[0.1em] text-indigo-200 uppercase">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-indigo-600">
                     Current Question
                   </p>
-                  <p className="text-base leading-relaxed text-slate-100 sm:text-lg">
+                  <p className="text-base leading-relaxed text-slate-800 sm:text-lg">
                     {currentQuestion?.question}
                   </p>
                 </motion.div>
@@ -588,19 +563,19 @@ function Step2interview({ interviewData, onFinish }) {
                 name="answer"
                 id="answer"
                 disabled={isSubmitting || isIntroPhase}
-                className="min-h-44 w-full resize-y rounded-2xl border border-white/15 bg-slate-900/55 p-4 text-sm leading-relaxed text-slate-100 outline-none transition-all duration-300 placeholder:text-slate-500 focus:border-cyan-300/60 focus:ring-2 focus:ring-cyan-300/20 focus:scale-[1.01]"
+                className="min-h-44 w-full resize-y rounded-xl border border-slate-300 bg-white p-4 text-sm leading-relaxed text-slate-900 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
               />
 
               {!feedback ? (
                 <div className="flex flex-wrap items-center gap-3">
                   <motion.button
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.96 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={toggleMic}
-                    className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-300 ${
+                    className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
                       isMicOn
-                        ? "border-cyan-300/45 bg-cyan-400/15 text-cyan-100 hover:bg-cyan-400/20"
-                        : "border-white/20 bg-white/5 text-slate-200 hover:border-cyan-300/35"
+                        ? "border-indigo-300 bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+                        : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
                     }`}
                   >
                     <span className="h-2 w-2 rounded-full bg-current" />
@@ -608,11 +583,11 @@ function Step2interview({ interviewData, onFinish }) {
                   </motion.button>
 
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
                     onClick={handleSubmitAnswer}
                     disabled={isSubmitting || !answer.trim() || isIntroPhase}
-                    className="rounded-xl bg-linear-to-r from-indigo-600 via-indigo-500 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(99,102,241,0.35)] transition-all duration-300 hover:shadow-[0_16px_34px_rgba(34,211,238,0.28)] disabled:cursor-not-allowed disabled:from-slate-600 disabled:to-slate-600 disabled:opacity-60"
+                    className="rounded-lg bg-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-indigo-600 hover:shadow-md disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
                   >
                     {isSubmitting ? "Submitting..." : "Submit Answer"}
                   </motion.button>
@@ -623,20 +598,20 @@ function Step2interview({ interviewData, onFinish }) {
                     initial={{ opacity: 0, height: 0, scale: 0.98 }}
                     animate={{ opacity: 1, height: "auto", scale: 1 }}
                     exit={{ opacity: 0, height: 0, scale: 0.98 }}
-                    transition={{ duration: 0.35, ease: "easeOut" }}
-                    className="overflow-hidden rounded-2xl border border-cyan-300/25 bg-cyan-400/8 p-4"
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="overflow-hidden rounded-xl border border-emerald-200 bg-emerald-50 p-4"
                   >
-                    <p className="mb-2 text-xs font-medium tracking-[0.1em] text-cyan-200 uppercase">
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-emerald-600">
                       AI Feedback
                     </p>
-                    <p className="text-sm leading-relaxed text-slate-100">
+                    <p className="text-sm leading-relaxed text-slate-700">
                       {feedback}
                     </p>
                     <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
                       onClick={handleNext}
-                      className="mt-4 rounded-xl bg-linear-to-r from-indigo-600 via-indigo-500 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(99,102,241,0.35)] transition-all duration-300 hover:shadow-[0_16px_34px_rgba(34,211,238,0.28)]"
+                      className="mt-4 rounded-lg bg-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-indigo-600 hover:shadow-md"
                     >
                       Next Question
                     </motion.button>

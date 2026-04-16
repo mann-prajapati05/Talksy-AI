@@ -12,29 +12,24 @@ function Timer({ timeLeft, totalTime }) {
       animate={
         isLowTime
           ? {
-              scale: [1, 1.05, 1],
-              filter: [
-                "drop-shadow(0 0 0 rgba(248,113,113,0))",
-                "drop-shadow(0 0 10px rgba(248,113,113,0.4))",
-                "drop-shadow(0 0 0 rgba(248,113,113,0))",
-              ],
+              scale: [1, 1.03, 1],
             }
-          : { scale: 1, filter: "drop-shadow(0 0 10px rgba(34,211,238,0.2))" }
+          : { scale: 1 }
       }
       transition={
         isLowTime
           ? { duration: 1.2, repeat: Infinity, ease: "easeInOut" }
-          : { duration: 0.4, ease: "easeOut" }
+          : { duration: 0.3, ease: "easeOut" }
       }
-      className="rounded-full border border-white/10 bg-slate-900/55 p-2"
+      className="rounded-full border border-slate-200 bg-white p-2 shadow-sm"
     >
       <CircularProgressbar
         value={percentage}
         text={`${timeLeft}s`}
         styles={buildStyles({
-          pathColor: isLowTime ? "#fb7185" : "#22d3ee",
-          trailColor: "rgba(255,255,255,0.12)",
-          textColor: isLowTime ? "#fecaca" : "#e2e8f0",
+          pathColor: isLowTime ? "#ef4444" : "#6366f1",
+          trailColor: "#e2e8f0",
+          textColor: isLowTime ? "#dc2626" : "#0f172a",
           textSize: "22px",
           strokeLinecap: "round",
           pathTransitionDuration: 0.35,

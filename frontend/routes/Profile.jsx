@@ -8,23 +8,21 @@ import { serverUrl } from "../routes/App";
 
 const backdropVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.3, ease: "easeInOut" } },
-  exit: { opacity: 0, transition: { duration: 0.25, ease: "easeInOut" } },
+  visible: { opacity: 1, transition: { duration: 0.25, ease: "easeInOut" } },
+  exit: { opacity: 0, transition: { duration: 0.2, ease: "easeInOut" } },
 };
 
 const panelVariants = {
-  hidden: { x: "100%", opacity: 0.98, scale: 0.985 },
+  hidden: { x: "100%", opacity: 0.98 },
   visible: {
     x: 0,
     opacity: 1,
-    scale: 1,
-    transition: { duration: 0.36, ease: "easeInOut" },
+    transition: { duration: 0.3, ease: "easeInOut" },
   },
   exit: {
     x: "100%",
     opacity: 0.98,
-    scale: 0.99,
-    transition: { duration: 0.3, ease: "easeInOut" },
+    transition: { duration: 0.25, ease: "easeInOut" },
   },
 };
 
@@ -80,7 +78,7 @@ const Profile = ({ isOpen = false, onClose = () => {} }) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-80 bg-black/40 backdrop-blur-[2px]"
+          className="fixed inset-0 z-80 bg-black/30 backdrop-blur-sm"
           variants={backdropVariants}
           initial="hidden"
           animate="visible"
@@ -88,25 +86,22 @@ const Profile = ({ isOpen = false, onClose = () => {} }) => {
           onClick={onClose}
         >
           <motion.aside
-            className="ml-auto flex h-full w-full max-w-100 flex-col overflow-hidden rounded-l-2xl border-l border-white/10 bg-linear-to-b from-slate-900 to-slate-800 shadow-[-24px_0_60px_rgba(2,6,23,0.6)]"
+            className="ml-auto flex h-full w-full max-w-100 flex-col border-l border-slate-200 bg-white shadow-2xl"
             variants={panelVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="relative flex h-full flex-col bg-white/5 p-5 backdrop-blur-xl sm:p-6">
-              <div className="pointer-events-none absolute -top-12 -right-8 h-44 w-44 rounded-full bg-cyan-400/15 blur-3xl"></div>
-              <div className="pointer-events-none absolute top-1/3 -left-14 h-44 w-44 rounded-full bg-violet-500/15 blur-3xl"></div>
-
-              <div className="relative z-10 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-slate-100">
+            <div className="flex h-full flex-col p-5 sm:p-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-bold text-slate-900">
                   Profile
                 </h2>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/5 text-slate-200 transition-all duration-300 hover:rotate-90 hover:border-cyan-300/45 hover:bg-white/10 hover:text-white"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all duration-200 hover:bg-slate-50 hover:text-slate-700"
                   aria-label="Close profile panel"
                 >
                   <svg
@@ -124,66 +119,66 @@ const Profile = ({ isOpen = false, onClose = () => {} }) => {
                 </button>
               </div>
 
-              <div className="relative z-10 mt-6 flex-1 overflow-y-auto pr-1">
-                <div className="rounded-2xl border border-white/10 bg-slate-900/40 p-5">
+              <div className="mt-6 flex-1 overflow-y-auto pr-1">
+                <div className="rounded-xl border border-slate-200 bg-white p-5">
                   <div className="flex flex-col items-center text-center">
                     {userData?.profilePicture ? (
                       <img
                         src={userData.profilePicture}
                         alt={`${userData?.name || "User"} profile`}
-                        className="h-24 w-24 rounded-full border-2 border-white/30 object-cover shadow-[0_10px_26px_rgba(6,182,212,0.25)]"
+                        className="h-20 w-20 rounded-full border-2 border-slate-200 object-cover shadow-sm"
                       />
                     ) : (
-                      <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-cyan-300/45 bg-linear-to-br from-indigo-600 to-violet-600 text-3xl font-semibold text-white shadow-[0_10px_26px_rgba(99,102,241,0.35)]">
+                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-indigo-500 text-2xl font-bold text-white shadow-sm">
                         {initials}
                       </div>
                     )}
 
                     <div className="mt-5 w-full space-y-3 text-left">
-                      <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-                        <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-slate-400">
+                      <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                        <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
                           Name
                         </p>
-                        <p className="mt-1 text-base font-medium text-slate-100">
+                        <p className="mt-1 text-sm font-medium text-slate-900">
                           {userData?.name || "Not provided"}
                         </p>
                       </div>
-                      <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-                        <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-slate-400">
+                      <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                        <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
                           Email
                         </p>
-                        <p className="mt-1 break-all text-sm font-medium text-slate-100">
+                        <p className="mt-1 break-all text-sm font-medium text-slate-900">
                           {userData?.email || "Not provided"}
                         </p>
                       </div>
-                      <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-                        <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-slate-400">
+                      <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                        <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
                           Gender
                         </p>
-                        <p className="mt-1 text-sm font-medium capitalize text-slate-100">
+                        <p className="mt-1 text-sm font-medium capitalize text-slate-900">
                           {userData?.gender || "Not provided"}
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="my-5 h-px w-full bg-white/10"></div>
+                  <div className="my-5 h-px w-full bg-slate-200"></div>
 
                   {userData && (
-                    <article className="mb-5 rounded-xl border border-cyan-300/20 bg-white/5 p-4 shadow-[0_10px_30px_rgba(34,211,238,0.12)] backdrop-blur-md">
-                      <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-cyan-200/80">
+                    <article className="mb-5 rounded-xl border border-indigo-200 bg-indigo-50 p-4">
+                      <p className="text-xs font-medium uppercase tracking-wider text-indigo-500">
                         Available Credits
                       </p>
-                      <p className="mt-2 text-3xl font-semibold leading-none text-cyan-200">
+                      <p className="mt-2 text-3xl font-bold leading-none text-indigo-700">
                         {userCredits}
                       </p>
-                      <p className="mt-2 text-xs text-slate-300">
+                      <p className="mt-2 text-xs text-slate-600">
                         Use credits for interviews
                       </p>
                       <button
                         type="button"
                         onClick={handleBuyCredits}
-                        className="mt-3 w-full rounded-lg border border-cyan-300/30 bg-cyan-400/10 px-3 py-2 text-xs font-semibold text-cyan-100 transition-all duration-300 hover:scale-[1.01] hover:border-cyan-200/50 hover:bg-cyan-400/15 hover:shadow-[0_12px_26px_rgba(34,211,238,0.2)]"
+                        className="mt-3 w-full rounded-lg bg-indigo-500 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-200 hover:bg-indigo-600 hover:shadow-md"
                       >
                         Buy Credits
                       </button>
@@ -193,10 +188,10 @@ const Profile = ({ isOpen = false, onClose = () => {} }) => {
                   <button
                     type="button"
                     onClick={handleOpenHistory}
-                    className="group mb-5 flex w-full items-center justify-between rounded-2xl border border-cyan-300/20 bg-linear-to-r from-cyan-400/10 via-white/5 to-indigo-500/10 px-4 py-4 text-left transition-all duration-300 hover:border-cyan-200/40 hover:shadow-[0_14px_34px_rgba(6,182,212,0.16)]"
+                    className="group mb-5 flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-left transition-all duration-200 hover:border-indigo-300 hover:shadow-sm"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-300/20 bg-cyan-400/10 text-cyan-100 transition-transform duration-300 group-hover:scale-105">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-transform duration-200 group-hover:scale-105">
                         <svg
                           className="h-5 w-5"
                           viewBox="0 0 24 24"
@@ -213,16 +208,16 @@ const Profile = ({ isOpen = false, onClose = () => {} }) => {
                         </svg>
                       </span>
                       <div>
-                        <p className="text-sm font-semibold text-slate-100">
+                        <p className="text-sm font-semibold text-slate-900">
                           Interview History
                         </p>
-                        <p className="mt-1 text-xs leading-5 text-slate-300">
+                        <p className="mt-0.5 text-xs text-slate-500">
                           Open your reports and session archive
                         </p>
                       </div>
                     </div>
                     <svg
-                      className="h-5 w-5 text-cyan-200 transition-transform duration-300 group-hover:translate-x-1"
+                      className="h-5 w-5 text-slate-400 transition-transform duration-200 group-hover:translate-x-1"
                       viewBox="0 0 24 24"
                       fill="none"
                       aria-hidden="true"
@@ -238,19 +233,19 @@ const Profile = ({ isOpen = false, onClose = () => {} }) => {
                   </button>
 
                   <div className="grid grid-cols-2 gap-3">
-                    <article className="rounded-xl border border-white/10 bg-white/5 p-3">
-                      <p className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
+                    <article className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                      <p className="text-xs uppercase tracking-wider text-slate-400">
                         Completion
                       </p>
-                      <p className="mt-1 text-xl font-semibold text-cyan-300">
+                      <p className="mt-1 text-xl font-bold text-indigo-600">
                         {completion}%
                       </p>
                     </article>
-                    <article className="rounded-xl border border-white/10 bg-white/5 p-3">
-                      <p className="text-[11px] uppercase tracking-[0.08em] text-slate-400">
+                    <article className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                      <p className="text-xs uppercase tracking-wider text-slate-400">
                         Sessions
                       </p>
-                      <p className="mt-1 text-xl font-semibold text-cyan-300">
+                      <p className="mt-1 text-xl font-bold text-indigo-600">
                         0
                       </p>
                     </article>
@@ -258,11 +253,11 @@ const Profile = ({ isOpen = false, onClose = () => {} }) => {
                 </div>
               </div>
 
-              <div className="relative z-10 mt-4 pt-2">
+              <div className="mt-4 pt-2">
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="w-full rounded-xl border border-rose-300/25 bg-rose-500/10 px-5 py-3 text-sm font-semibold text-rose-100 transition-all duration-300 hover:scale-[1.01] hover:border-rose-300/40 hover:bg-rose-500/15 hover:shadow-[0_14px_30px_rgba(244,63,94,0.2)] focus:outline-none focus:ring-2 focus:ring-rose-300/35"
+                  className="w-full rounded-lg border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-600 transition-all duration-200 hover:bg-red-100 hover:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-500/20"
                 >
                   Logout
                 </button>

@@ -24,7 +24,14 @@ function InterviewReport() {
   }, []);
 
   if (!report) {
-    return <div> Loading report..</div>;
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent"></div>
+          <p className="mt-3 text-sm font-medium text-slate-500">Loading report...</p>
+        </div>
+      </div>
+    );
   }
 
   return <Step3Report report={report} />;

@@ -67,18 +67,18 @@ function PricingCard({ plan, onBuy }) {
 
   return (
     <article
-      className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border bg-white/70 p-6 shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl sm:p-7 ${
+      className={`group relative flex h-full flex-col rounded-2xl border bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg sm:p-7 ${
         isBest
-          ? "scale-[1.01] border-teal-500 shadow-[0_20px_60px_rgba(13,148,136,0.25)]"
+          ? "border-indigo-500 shadow-md ring-1 ring-indigo-500/20"
           : "border-slate-200"
       }`}
     >
       {safeBadge && (
         <span
-          className={`absolute right-4 top-4 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold tracking-wide ${
+          className={`absolute right-4 top-4 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${
             isBest
-              ? "bg-teal-500 text-white"
-              : "bg-slate-100 text-slate-700 ring-1 ring-slate-200"
+              ? "bg-indigo-500 text-white"
+              : "bg-slate-100 text-slate-600 ring-1 ring-slate-200"
           }`}
         >
           {isBest && <Sparkles className="h-3.5 w-3.5" />}
@@ -95,10 +95,10 @@ function PricingCard({ plan, onBuy }) {
         </p>
       </div>
 
-      <div className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
+      <div className="rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
+            <p className="text-xs font-medium uppercase tracking-widest text-slate-500">
               Plan Price
             </p>
             <p className="mt-1 text-3xl font-extrabold text-slate-900">
@@ -106,7 +106,7 @@ function PricingCard({ plan, onBuy }) {
             </p>
           </div>
           <div className="text-right">
-            <p className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
+            <p className="text-xs font-medium uppercase tracking-widest text-slate-500">
               Credits
             </p>
             <p className="mt-1 text-xl font-bold text-slate-800">
@@ -123,7 +123,7 @@ function PricingCard({ plan, onBuy }) {
               key={`${plan?.id || safeName}-feature-${index}`}
               className="flex items-start gap-3 text-sm text-slate-700"
             >
-              <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-100 text-teal-700">
+              <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
                 <Check className="h-3.5 w-3.5" />
               </span>
               <span>{feature}</span>
@@ -136,12 +136,12 @@ function PricingCard({ plan, onBuy }) {
         )}
       </ul>
 
-      <div className="mt-7 pt-2">
+      <div className="mt-auto pt-7">
         {isFree ? (
           <button
             type="button"
             disabled
-            className="w-full cursor-not-allowed rounded-xl border border-slate-300 bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-500"
+            className="w-full cursor-not-allowed rounded-lg border border-slate-300 bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-500"
           >
             Current Plan
           </button>
@@ -149,7 +149,7 @@ function PricingCard({ plan, onBuy }) {
           <button
             type="button"
             onClick={() => onBuy?.(plan)}
-            className="w-full rounded-xl bg-linear-to-r from-teal-500 to-cyan-500 px-4 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(20,184,166,0.35)] transition duration-300 hover:brightness-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400/70"
+            className="w-full rounded-lg bg-indigo-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-indigo-600 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/30"
           >
             Buy Now
           </button>
@@ -207,7 +207,7 @@ function Pricing() {
           navigate("/");
         },
         theme: {
-          color: "#14b8a6",
+          color: "#6366f1",
         },
       };
 
@@ -224,17 +224,13 @@ function Pricing() {
   };
 
   return (
-    <section className="relative isolate overflow-hidden px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-cyan-50 via-white to-slate-100" />
-      <div className="pointer-events-none absolute -left-24 top-10 -z-10 h-72 w-72 rounded-full bg-cyan-200/40 blur-3xl" />
-      <div className="pointer-events-none absolute -right-24 bottom-12 -z-10 h-80 w-80 rounded-full bg-teal-200/40 blur-3xl" />
-
+    <section className="px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
       <div className="mx-auto max-w-6xl">
         <header className="mx-auto max-w-2xl text-center">
-          <p className="inline-flex rounded-full border border-cyan-200 bg-white px-4 py-1 text-xs font-semibold tracking-[0.14em] text-cyan-700">
+          <p className="inline-flex rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1 text-xs font-semibold tracking-widest text-indigo-600">
             FLEXIBLE CREDITS
           </p>
-          <h1 className="mt-5 text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
+          <h1 className="mt-5 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
             Choose the plan that fits your prep speed
           </h1>
           <p className="mt-4 text-sm leading-6 text-slate-600 sm:text-base">
