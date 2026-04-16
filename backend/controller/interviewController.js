@@ -639,7 +639,7 @@ Evaluate like a real expert interviewer — fair, strict, and genuinely helpful 
         return res.status(500).json({
             success:false,
             message:"something went wrong while evalution of answer..",
-            err
+            error:`${err}`
         })
     }
 }
