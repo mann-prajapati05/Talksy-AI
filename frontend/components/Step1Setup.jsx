@@ -11,90 +11,42 @@ const EXPERIENCE_OPTIONS = ["Fresher", "1-3 years", "3+ years"];
 const INTERVIEW_MODES = ["Technical", "HR", "Mixed"];
 const INTERVIEW_LENGTH_OPTIONS = ["short", "medium", "long"];
 
-const normalizeExperienceOption = (rawExperience) => {
-  const normalized = String(rawExperience || "")
-    .trim()
-    .toLowerCase();
-
-  if (!normalized) return "";
-  if (normalized.includes("fresher")) return "Fresher";
-  if (normalized.includes("1-3") || normalized.includes("1 to 3")) {
-    return "1-3 years";
-  }
-  if (normalized.includes("3+") || normalized.includes("3 plus")) {
-    return "3+ years";
-  }
-
+const normalizeExperienceOption = (raw) => {
+  const n = String(raw || "").trim().toLowerCase();
+  if (!n) return "";
+  if (n.includes("fresher")) return "Fresher";
+  if (n.includes("1-3") || n.includes("1 to 3")) return "1-3 years";
+  if (n.includes("3+") || n.includes("3 plus")) return "3+ years";
   return "";
 };
 
-const normalizeExtractedExperience = (rawExperience) => {
-  const list = Array.isArray(rawExperience)
-    ? rawExperience
-    : rawExperience
-      ? [rawExperience]
-      : [];
-
+const normalizeExtractedExperience = (raw) => {
+  const list = Array.isArray(raw) ? raw : raw ? [raw] : [];
   return list.filter(Boolean).map((entry) => {
-    if (typeof entry === "string") {
-      return {
-        company: "",
-        type: "",
-        mode: "",
-        employment: "",
-        description: entry,
-      };
-    }
-
-    if (typeof entry === "object") {
-      return {
-        company: String(entry.company || "").trim(),
-        type: String(entry.type || "").trim(),
-        mode: String(entry.mode || "").trim(),
-        employment: String(entry.employment || "").trim(),
-        description: String(entry.description || "").trim(),
-      };
-    }
-
-    return {
-      company: "",
-      type: "",
-      mode: "",
-      employment: "",
-      description: "",
+    if (typeof entry === "string") return { company: "", type: "", mode: "", employment: "", description: entry };
+    if (typeof entry === "object") return {
+      company: String(entry.company || "").trim(), type: String(entry.type || "").trim(),
+      mode: String(entry.mode || "").trim(), employment: String(entry.employment || "").trim(),
+      description: String(entry.description || "").trim(),
     };
+    return { company: "", type: "", mode: "", employment: "", description: "" };
   });
 };
 
 const containerVariants = {
-  hidden: { opacity: 0, y: 16 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: "easeOut",
-      when: "beforeChildren",
-      staggerChildren: 0.08,
-    },
-  },
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
 };
 
-const sectionVariants = {
-  hidden: { opacity: 0, y: 10 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.3, ease: "easeOut" },
-  },
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
 };
 
 function SectionLabel({ title, hint }) {
   return (
     <div className="mb-3 flex items-center justify-between gap-3">
-      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-        {title}
-      </p>
+      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{title}</p>
       {hint ? <p className="text-xs text-slate-400">{hint}</p> : null}
     </div>
   );
@@ -103,14 +55,13 @@ function SectionLabel({ title, hint }) {
 function OptionButton({ active, label, onClick }) {
   return (
     <motion.button
-      whileHover={{ scale: 1.01 }}
-      whileTap={{ scale: 0.99 }}
-      type="button"
-      onClick={onClick}
-      className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
+      whileHover={{ scale: 1.03, y: -2 }}
+      whileTap={{ scale: 0.97 }}
+      type="button" onClick={onClick}
+      className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
         active
-          ? "border-indigo-500 bg-indigo-50 text-indigo-700 shadow-sm"
-          : "border-slate-300 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50"
+          ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-violet-50 text-indigo-700 shadow-sm shadow-indigo-100 ring-1 ring-indigo-200"
+          : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:shadow-sm"
       }`}
     >
       {label}
@@ -144,445 +95,171 @@ function Step1Setup({ onStart }) {
   const handleUploadResume = async () => {
     if (!resumeFile || analyzing) return;
     setAnalyzing(true);
-
     const formData = new FormData();
     formData.append("resume", resumeFile);
-    if (userData === null) {
-      navigate("/login");
-      return;
-    }
+    if (userData === null) { navigate("/login"); return; }
     try {
-      const result = await axios.post(
-        `${serverUrl}/interview/resume-analyze`,
-        formData,
-        {
-          withCredentials: true,
-        },
-      );
-
-      const extractedList = normalizeExtractedExperience(
-        result.data?.experience,
-      );
-      const suggestedExperience = normalizeExperienceOption(
-        extractedList[0]?.description,
-      );
-
-      if (!experience && suggestedExperience) {
-        setExperience(suggestedExperience);
-      }
-
+      const result = await axios.post(`${serverUrl}/interview/resume-analyze`, formData, { withCredentials: true });
+      const extractedList = normalizeExtractedExperience(result.data?.experience);
+      const suggestedExperience = normalizeExperienceOption(extractedList[0]?.description);
+      if (!experience && suggestedExperience) setExperience(suggestedExperience);
       setExtractedExperience(extractedList);
       setProjects(result.data.projects || []);
       setSkills(result.data.skills || []);
       setResumeText(result.data.resumeText || "");
       setAnalysisDone(true);
-    } catch (err) {
-      console.error("Resume analysis failed", err);
-    } finally {
-      setAnalyzing(false);
-    }
+    } catch (err) { console.error("Resume analysis failed", err); }
+    finally { setAnalyzing(false); }
   };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files?.[0] || null;
-    setResumeFile(file);
-    setAnalysisDone(false);
-  };
+  const handleFileChange = (e) => { setResumeFile(e.target.files?.[0] || null); setAnalysisDone(false); };
+  const handleDrop = (e) => { e.preventDefault(); e.stopPropagation(); setDragActive(false); const f = e.dataTransfer.files?.[0]; if (f) { setResumeFile(f); setAnalysisDone(false); } };
 
-  const handleDrop = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setDragActive(false);
-    const file = event.dataTransfer.files?.[0] || null;
-    if (!file) return;
-    setResumeFile(file);
-    setAnalysisDone(false);
-  };
-
-  const canStart =
-    Boolean(role.trim()) &&
-    Boolean(experience.trim()) &&
-    Boolean(mode.trim()) &&
-    Boolean(interviewLength.trim()) &&
-    !analyzing;
+  const canStart = Boolean(role.trim()) && Boolean(experience) && Boolean(mode) && Boolean(interviewLength) && !analyzing;
 
   const handleStartInterview = async () => {
     if (!canStart || loading) return;
     setLoading(true);
-    console.log(userData);
-    if (userData === null) {
-      setLoading(false);
-      navigate("/login");
-      return;
-    }
-
-    if (hasInsufficientCredits) {
-      setCreditError(
-        "Need at least 20 credits to start MockHire. Buy credits to continue.",
-      );
-      setLoading(false);
-      return;
-    }
-
+    if (userData === null) { setLoading(false); navigate("/login"); return; }
+    if (hasInsufficientCredits) { setCreditError("Need at least 20 credits to start MockHire."); setLoading(false); return; }
     setCreditError("");
-
     try {
-      const result = await axios.post(
-        `${serverUrl}/interview/generate-questions`,
-        {
-          role: role.trim(),
-          experience,
-          mode,
-          length: interviewLength,
-          projects,
-          skills,
-          resumeText,
-        },
-        {
-          withCredentials: true,
-        },
-      );
-      console.log(result.data);
-
-      if (userData) {
-        dispatch(
-          setUserData({ ...userData, credits: result.data.creditsLeft }),
-        );
-      }
+      const result = await axios.post(`${serverUrl}/interview/generate-questions`, {
+        role: role.trim(), experience, mode, length: interviewLength, projects, skills, resumeText,
+      }, { withCredentials: true });
+      if (userData) dispatch(setUserData({ ...userData, credits: result.data.creditsLeft }));
       setLoading(false);
       onStart(result.data);
     } catch (err) {
-      console.log("Error while Start Interview..", err);
-      const backendMessage = err?.response?.data?.message || "";
-      if (backendMessage.toLowerCase().includes("credit")) {
-        setCreditError(
-          "Need at least 20 credits to start MockHire. Buy credits to continue.",
-        );
-      }
+      const msg = err?.response?.data?.message || "";
+      if (msg.toLowerCase().includes("credit")) setCreditError("Need at least 20 credits.");
       setLoading(false);
     }
   };
 
   return (
-    <motion.section
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
-      className="min-h-screen bg-white px-4 py-10 text-slate-900 sm:px-6"
-    >
+    <motion.section variants={containerVariants} initial="hidden" animate="show" className="min-h-screen px-4 py-10 sm:px-6">
       <div className="mx-auto w-full max-w-4xl">
-        <motion.header variants={sectionVariants} className="mb-8 text-center">
-          <p className="inline-flex rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1 text-xs font-semibold tracking-wide text-indigo-600">
-            Step 1 of 3
-          </p>
-          <h1 className="mt-4 text-3xl font-bold text-slate-900 sm:text-4xl">
-            Setup Your Mock Interview
+        <motion.header variants={fadeUp} className="mb-8 text-center">
+          <p className="inline-flex rounded-full border border-indigo-100 bg-gradient-to-r from-indigo-50 to-violet-50 px-4 py-1.5 text-xs font-semibold tracking-wide text-indigo-600 shadow-sm">✦ Step 1 of 3</p>
+          <h1 className="mt-4 text-3xl font-extrabold text-slate-900 sm:text-4xl">
+            Setup Your <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">Mock Interview</span>
           </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-sm text-slate-600 sm:text-base">
-            Configure your target role, interview focus, and optionally let AI
-            read your resume to personalize the session.
-          </p>
+          <p className="mx-auto mt-3 max-w-2xl text-sm text-slate-500 sm:text-base">Configure your target role and optionally upload your resume.</p>
         </motion.header>
 
-        <motion.div
-          variants={sectionVariants}
-          className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
-        >
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
-            className="space-y-7"
-          >
-            <motion.div variants={sectionVariants}>
+        <motion.div variants={fadeUp} className="glass-card rounded-2xl p-6 shadow-xl shadow-slate-200/40 sm:p-8">
+          <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-7">
+            <motion.div variants={fadeUp}>
               <SectionLabel title="Role" hint="Job profile you are targeting" />
-              <input
-                type="text"
-                value={role}
-                onChange={(event) => setRole(event.target.value)}
-                placeholder="e.g. Frontend Developer"
-                className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
-              />
+              <input type="text" value={role} onChange={(e) => setRole(e.target.value)} placeholder="e.g. Frontend Developer"
+                className="w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:shadow-md focus:shadow-indigo-100 focus:scale-[1.01]" />
             </motion.div>
 
-            <motion.div variants={sectionVariants}>
+            <motion.div variants={fadeUp}>
               <SectionLabel title="Experience" hint="Pick the closest level" />
-              <div className="flex flex-wrap gap-3">
-                {EXPERIENCE_OPTIONS.map((option) => (
-                  <OptionButton
-                    key={option}
-                    label={option}
-                    active={experience === option}
-                    onClick={() => setExperience(option)}
-                  />
-                ))}
-              </div>
+              <div className="flex flex-wrap gap-3">{EXPERIENCE_OPTIONS.map((o) => <OptionButton key={o} label={o} active={experience === o} onClick={() => setExperience(o)} />)}</div>
             </motion.div>
 
-            <motion.div variants={sectionVariants}>
-              <SectionLabel
-                title="Interview Mode"
-                hint="Choose your practice style"
-              />
-              <div className="grid gap-3 sm:grid-cols-3">
-                {INTERVIEW_MODES.map((option) => (
-                  <OptionButton
-                    key={option}
-                    label={option}
-                    active={mode === option}
-                    onClick={() => setMode(option)}
-                  />
-                ))}
-              </div>
+            <motion.div variants={fadeUp}>
+              <SectionLabel title="Interview Mode" />
+              <div className="grid gap-3 sm:grid-cols-3">{INTERVIEW_MODES.map((o) => <OptionButton key={o} label={o} active={mode === o} onClick={() => setMode(o)} />)}</div>
             </motion.div>
 
-            <motion.div variants={sectionVariants}>
-              <SectionLabel
-                title="Interview Length"
-                hint="Choose question depth"
-              />
-              <div className="grid gap-3 sm:grid-cols-3">
-                {INTERVIEW_LENGTH_OPTIONS.map((option) => (
-                  <OptionButton
-                    key={option}
-                    label={option}
-                    active={interviewLength === option}
-                    onClick={() => setInterviewLength(option)}
-                  />
-                ))}
-              </div>
+            <motion.div variants={fadeUp}>
+              <SectionLabel title="Interview Length" />
+              <div className="grid gap-3 sm:grid-cols-3">{INTERVIEW_LENGTH_OPTIONS.map((o) => <OptionButton key={o} label={o} active={interviewLength === o} onClick={() => setInterviewLength(o)} />)}</div>
             </motion.div>
 
-            <motion.div
-              variants={sectionVariants}
-              className="rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-5"
-            >
-              <SectionLabel
-                title="Resume Analysis"
-                hint="Upload once, personalize instantly"
-              />
-
+            <motion.div variants={fadeUp} className="rounded-xl border border-slate-200/60 bg-gradient-to-br from-slate-50 to-indigo-50/20 p-4 sm:p-5">
+              <SectionLabel title="Resume Analysis" hint="Personalize with AI" />
               <label
                 onDragEnter={() => setDragActive(true)}
-                onDragOver={(event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  setDragActive(true);
-                }}
-                onDragLeave={(event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  setDragActive(false);
-                }}
+                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDragActive(true); }}
+                onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setDragActive(false); }}
                 onDrop={handleDrop}
-                className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-4 py-7 text-center transition-all duration-200 ${
-                  dragActive
-                    ? "border-indigo-400 bg-indigo-50"
-                    : "border-slate-300 bg-white hover:border-indigo-400 hover:bg-indigo-50/30"
+                className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-7 text-center transition-all duration-200 ${
+                  dragActive ? "border-indigo-400 bg-indigo-50 shadow-inner" : "border-slate-300 bg-white/80 hover:border-indigo-400 hover:bg-indigo-50/30"
                 }`}
               >
-                <input
-                  type="file"
-                  accept=".pdf,.doc,.docx,.txt"
-                  className="hidden"
-                  onChange={handleFileChange}
-                />
-                <p className="text-sm font-medium text-slate-700">
-                  Drop your resume here or click to upload
-                </p>
-                <p className="mt-1 text-xs text-slate-400">
-                  Supported formats: PDF, DOC, DOCX, TXT
-                </p>
+                <input type="file" accept=".pdf,.doc,.docx,.txt" className="hidden" onChange={handleFileChange} />
+                <svg className="h-8 w-8 text-indigo-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                <p className="text-sm font-medium text-slate-600">Drop your resume or <span className="text-indigo-600 font-semibold">click to upload</span></p>
+                <p className="mt-1 text-xs text-slate-400">PDF, DOC, DOCX, TXT</p>
               </label>
 
               <AnimatePresence>
-                {resumeFile ? (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 8 }}
-                    className="mt-4 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <p className="text-sm text-slate-600">
-                      Selected:{" "}
-                      <span className="font-medium text-slate-900">
-                        {resumeFile.name}
-                      </span>
-                    </p>
-                    <motion.button
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.99 }}
-                      type="button"
-                      onClick={handleUploadResume}
-                      disabled={analyzing}
-                      className="rounded-lg bg-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-indigo-600 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {analyzing ? "Analyzing resume..." : "Analyze Resume"}
+                {resumeFile && (
+                  <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
+                    className="mt-4 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-sm text-slate-600">Selected: <span className="font-medium text-slate-900">{resumeFile.name}</span></p>
+                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="button" onClick={handleUploadResume} disabled={analyzing}
+                      className="rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                      {analyzing ? (<span className="inline-flex items-center gap-2"><svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Analyzing...</span>) : "Analyze Resume"}
                     </motion.button>
                   </motion.div>
-                ) : null}
+                )}
               </AnimatePresence>
 
               <AnimatePresence>
-                {analysisDone ? (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                    animate={{ opacity: 1, height: "auto", marginTop: 20 }}
-                    exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="overflow-hidden rounded-xl border border-indigo-200 bg-indigo-50/50 p-4"
-                  >
-                    <p className="text-xs font-semibold uppercase tracking-wider text-indigo-600">
-                      AI Extracted Profile
-                    </p>
-
+                {analysisDone && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto", marginTop: 20 }} exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden rounded-xl border border-indigo-200/60 bg-gradient-to-br from-indigo-50/80 to-violet-50/50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-indigo-600">✦ AI Extracted Profile</p>
                     <div className="mt-3">
-                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-                        Experience
-                      </p>
+                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Experience</p>
                       <div className="mt-2 space-y-2">
-                        {extractedExperience.length ? (
-                          extractedExperience.map((item, index) => (
-                            <div
-                              key={`experience-${index}`}
-                              className="rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-700"
-                            >
-                              <div className="grid gap-2 sm:grid-cols-2">
-                                <p>
-                                  <span className="text-slate-500">
-                                    Company:{" "}
-                                  </span>
-                                  {item.company || "Not specified"}
-                                </p>
-                                <p>
-                                  <span className="text-slate-500">Type: </span>
-                                  {item.type || "Not specified"}
-                                </p>
-                                <p>
-                                  <span className="text-slate-500">Mode: </span>
-                                  {item.mode || "Not specified"}
-                                </p>
-                                <p>
-                                  <span className="text-slate-500">
-                                    Employment:{" "}
-                                  </span>
-                                  {item.employment || "Not specified"}
-                                </p>
-                              </div>
-                              <p className="mt-2 text-slate-600">
-                                <span className="text-slate-500">
-                                  Description:{" "}
-                                </span>
-                                {item.description || "Not specified"}
-                              </p>
+                        {extractedExperience.length ? extractedExperience.map((item, i) => (
+                          <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                            className="rounded-lg border border-slate-200/60 bg-white/80 p-3 text-sm text-slate-600 shadow-sm">
+                            <div className="grid gap-2 sm:grid-cols-2">
+                              <p><span className="text-slate-400">Company: </span>{item.company || "N/A"}</p>
+                              <p><span className="text-slate-400">Type: </span>{item.type || "N/A"}</p>
                             </div>
-                          ))
-                        ) : (
-                          <p className="text-sm text-slate-400">
-                            No experience extracted yet.
-                          </p>
-                        )}
+                            <p className="mt-2 text-slate-500"><span className="text-slate-400">Description: </span>{item.description || "N/A"}</p>
+                          </motion.div>
+                        )) : <p className="text-sm text-slate-400">No experience data.</p>}
                       </div>
                     </div>
-
                     <div className="mt-3">
-                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-                        Skills
-                      </p>
+                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Skills</p>
                       <div className="mt-2 flex flex-wrap gap-2">
-                        {skills.length ? (
-                          skills.map((skill, index) => (
-                            <span
-                              key={`${skill}-${index}`}
-                              className="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700"
-                            >
-                              {skill}
-                            </span>
-                          ))
-                        ) : (
-                          <p className="text-sm text-slate-400">
-                            No skills extracted yet.
-                          </p>
-                        )}
+                        {skills.length ? skills.map((s, i) => (
+                          <motion.span key={`${s}-${i}`} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.03 }}
+                            className="rounded-full border border-indigo-100 bg-gradient-to-r from-indigo-50 to-violet-50 px-3 py-1 text-xs font-medium text-indigo-700 shadow-sm">{s}</motion.span>
+                        )) : <p className="text-sm text-slate-400">No skills data.</p>}
                       </div>
                     </div>
-
-                    <div className="mt-4">
-                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-                        Projects
-                      </p>
+                    <div className="mt-3">
+                      <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Projects</p>
                       <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                        {projects.length ? (
-                          projects.map((project, index) => (
-                            <div
-                              key={`${project}-${index}`}
-                              className="rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-700"
-                            >
-                              {project}
-                            </div>
-                          ))
-                        ) : (
-                          <p className="text-sm text-slate-400">
-                            No projects extracted yet.
-                          </p>
-                        )}
+                        {projects.length ? projects.map((p, i) => (
+                          <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+                            className="rounded-lg border border-slate-200/60 bg-white/80 p-3 text-sm text-slate-600 shadow-sm">{p}</motion.div>
+                        )) : <p className="text-sm text-slate-400">No projects data.</p>}
                       </div>
                     </div>
-
-                    {resumeText ? (
-                      <div className="mt-4 rounded-lg border border-slate-200 bg-white p-3">
-                        <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-                          Resume Snapshot
-                        </p>
-                        <p className="mt-2 max-h-24 overflow-hidden text-sm text-slate-600">
-                          {resumeText}
-                        </p>
-                      </div>
-                    ) : null}
                   </motion.div>
-                ) : null}
+                )}
               </AnimatePresence>
             </motion.div>
 
-            <motion.div variants={sectionVariants} className="pt-1">
+            <motion.div variants={fadeUp} className="pt-1">
               {hasInsufficientCredits && (
-                <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-center">
-                  <p className="text-xs font-semibold text-amber-800 sm:text-sm">
-                    Need at least 20 credits to start interview. You currently
-                    have {userCredits}.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => navigate("/pricing")}
-                    className="mt-2 rounded-lg bg-amber-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-200 hover:bg-amber-600"
-                  >
-                    Buy Credits
-                  </button>
-                </div>
+                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                  className="mb-3 rounded-xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-center shadow-sm">
+                  <p className="text-xs font-semibold text-amber-800 sm:text-sm">Need at least 20 credits. You have {userCredits}.</p>
+                  <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} type="button" onClick={() => navigate("/pricing")}
+                    className="mt-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 text-xs font-semibold text-white shadow-md hover:shadow-lg">Buy Credits</motion.button>
+                </motion.div>
               )}
-
-              {creditError && !hasInsufficientCredits ? (
-                <p className="mb-3 text-center text-xs font-medium text-amber-700">
-                  {creditError}
-                </p>
-              ) : null}
-
-              <motion.button
-                whileHover={{ scale: canStart ? 1.01 : 1 }}
-                whileTap={{ scale: canStart ? 0.99 : 1 }}
-                type="button"
-                onClick={handleStartInterview}
-                disabled={!canStart || loading || hasInsufficientCredits}
-                className="w-full rounded-lg bg-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-indigo-600 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {loading ? "Starting..." : "Start Interview"}
+              {creditError && !hasInsufficientCredits && <p className="mb-3 text-center text-xs font-medium text-amber-700">{creditError}</p>}
+              <motion.button whileHover={{ scale: canStart ? 1.02 : 1, y: canStart ? -1 : 0 }} whileTap={{ scale: canStart ? 0.98 : 1 }}
+                type="button" onClick={handleStartInterview} disabled={!canStart || loading || hasInsufficientCredits}
+                className="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-200/50 transition-all duration-200 hover:shadow-xl hover:shadow-indigo-200/70 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none">
+                {loading ? (<span className="inline-flex items-center gap-2"><svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Starting...</span>) : "Start Interview →"}
               </motion.button>
-              {!canStart ? (
-                <p className="mt-2 text-center text-xs text-slate-400">
-                  Fill role, experience, interview mode, and interview length to
-                  continue.
-                </p>
-              ) : null}
+              {!canStart && <p className="mt-2 text-center text-xs text-slate-400">Fill all fields to continue.</p>}
             </motion.div>
           </motion.div>
         </motion.div>
