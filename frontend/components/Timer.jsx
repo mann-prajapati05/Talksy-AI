@@ -11,9 +11,7 @@ function Timer({ timeLeft, totalTime }) {
     <motion.div
       animate={
         isLowTime
-          ? {
-              scale: [1, 1.03, 1],
-            }
+          ? { scale: [1, 1.04, 1] }
           : { scale: 1 }
       }
       transition={
@@ -21,7 +19,7 @@ function Timer({ timeLeft, totalTime }) {
           ? { duration: 1.2, repeat: Infinity, ease: "easeInOut" }
           : { duration: 0.3, ease: "easeOut" }
       }
-      className="rounded-full border border-slate-200 bg-white p-2 shadow-sm"
+      className="rounded-full border border-slate-200/60 bg-white/80 p-2 shadow-lg shadow-slate-200/40 backdrop-blur-sm"
     >
       <CircularProgressbar
         value={percentage}

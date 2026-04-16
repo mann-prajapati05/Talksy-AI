@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { motion } from "framer-motion";
 
 function Header({ onProfileClick }) {
   const userData = useSelector((state) => state.user.userData);
@@ -9,20 +10,28 @@ function Header({ onProfileClick }) {
   const isLoggedIn = Boolean(userData);
 
   const profileInitial = useMemo(() => {
-    if (!userName) {
-      return "P";
-    }
+    if (!userName) return "P";
     return userName.charAt(0).toUpperCase();
   }, [userName]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-lg">
+    <motion.header
+      initial={{ opacity: 0, y: -12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="sticky top-0 z-50 border-b border-slate-200/60 bg-white/70 backdrop-blur-xl"
+    >
       <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-3">
         <div>
           <Link to="/">
-            <span className="text-xl font-bold tracking-tight text-slate-900">
+            <motion.span
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              className="inline-block text-xl font-bold tracking-tight text-slate-900"
+            >
               Talksy
-            </span>
+              <span className="bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent">.</span>
+            </motion.span>
           </Link>
         </div>
 
@@ -30,31 +39,40 @@ function Header({ onProfileClick }) {
           {!isLoggedIn ? (
             <>
               <Link to="/login">
-                <button
-                  className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-slate-50 hover:border-slate-400"
+                <motion.button
+                  whileHover={{ scale: 1.03, y: -1 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md"
                   type="button"
                 >
                   Login
-                </button>
+                </motion.button>
               </Link>
               <Link to="/signup">
-                <button
-                  className="rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-indigo-600 hover:shadow-md"
+                <motion.button
+                  whileHover={{ scale: 1.03, y: -1 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 px-4 py-2 text-sm font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg hover:shadow-indigo-200"
                   type="button"
                 >
                   Sign up
-                </button>
+                </motion.button>
               </Link>
             </>
           ) : (
             <>
-              <div className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700">
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-100 bg-indigo-50/80 px-3 py-1.5 text-xs font-semibold text-indigo-700 backdrop-blur-sm"
+              >
                 <span className="text-sm leading-none">⚡</span>
                 <span className="whitespace-nowrap">{userCredits} Credits</span>
-              </div>
+              </motion.div>
 
-              <button
-                className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-slate-200 bg-indigo-500 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:border-indigo-300 hover:shadow-md"
+              <motion.button
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-sm font-semibold text-white shadow-md ring-2 ring-white transition-all duration-200 hover:shadow-lg hover:shadow-indigo-200"
                 type="button"
                 onClick={onProfileClick}
                 aria-label="Profile"
@@ -69,12 +87,12 @@ function Header({ onProfileClick }) {
                 ) : (
                   profileInitial
                 )}
-              </button>
+              </motion.button>
             </>
           )}
         </div>
       </div>
-    </header>
+    </motion.header>
   );
 }
 
