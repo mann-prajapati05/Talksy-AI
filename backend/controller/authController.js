@@ -25,7 +25,7 @@ export const login = async(req,res,next) =>{
         
         res.cookie("userToken",token,{
             httpOnly:true,
-            secure:process.env.NODE_ENV==='production',
+            secure:process.env.NODE_ENV==="prodution",
             maxAge:2*24*3600000,
             sameSite:process.env.NODE_ENV==="prodution"? 'none' :'strict'
         });
@@ -119,7 +119,7 @@ export const signup=[
 
             res.cookie("userToken",token,{
                 httpOnly:true,
-                secure:process.env.NODE_ENV==='prod',
+                secure:process.env.NODE_ENV==="prodution",
                 maxAge:2*24*3600000,
                 sameSite:process.env.NODE_ENV==="prodution"? 'none' :'strict'
             });
@@ -167,7 +167,7 @@ export const googleAuth = async(req,res,next) =>{
 
     res.cookie("userToken" ,token,{
         httpOnly:true,
-        secure:process.env.NODE_ENV==='prod',
+        secure:process.env.NODE_ENV==="prodution",
         maxAge:2*24*3600000,
         sameSite:process.env.NODE_ENV==="prodution"? 'none' :'strict'
     });
