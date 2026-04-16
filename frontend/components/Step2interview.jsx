@@ -42,8 +42,8 @@ const questionVariants = {
 
 function Step2interview({ interviewData, onFinish }) {
   const { interviewId, userName, questions } = interviewData;
-  const maleVideo = "../public/male-ai.mp4";
-  const femaleVideo = "../public/female-ai.mp4";
+  const maleVideo = "/male-ai.mp4";
+  const femaleVideo = "/female-ai.mp4";
   const userData = useSelector((state) => state.user);
 
   const [isIntroPhase, setIsIntroPhase] = useState(true);

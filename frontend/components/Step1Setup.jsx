@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 const EXPERIENCE_OPTIONS = ["Fresher", "1-3 years", "3+ years"];
 const INTERVIEW_MODES = ["Technical", "HR", "Mixed"];
+const INTERVIEW_LENGTH_OPTIONS = ["short", "medium", "long"];
 
 const normalizeExperienceOption = (rawExperience) => {
   const normalized = String(rawExperience || "")
@@ -124,6 +125,7 @@ function Step1Setup({ onStart }) {
   const [role, setRole] = useState("");
   const [experience, setExperience] = useState("");
   const [mode, setMode] = useState("");
+  const [interviewLength, setInterviewLength] = useState("");
   const [resumeFile, setResumeFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [extractedExperience, setExtractedExperience] = useState([]);
@@ -200,6 +202,7 @@ function Step1Setup({ onStart }) {
     Boolean(role.trim()) &&
     Boolean(experience.trim()) &&
     Boolean(mode.trim()) &&
+    Boolean(interviewLength.trim()) &&
     !analyzing;
 
   const handleStartInterview = async () => {
@@ -229,6 +232,7 @@ function Step1Setup({ onStart }) {
           role: role.trim(),
           experience,
           mode,
+          length: interviewLength,
           projects,
           skills,
           resumeText,
@@ -331,6 +335,23 @@ function Step1Setup({ onStart }) {
                     label={option}
                     active={mode === option}
                     onClick={() => setMode(option)}
+                  />
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div variants={sectionVariants}>
+              <SectionLabel
+                title="Interview Length"
+                hint="Choose question depth"
+              />
+              <div className="grid gap-3 sm:grid-cols-3">
+                {INTERVIEW_LENGTH_OPTIONS.map((option) => (
+                  <OptionButton
+                    key={option}
+                    label={option}
+                    active={interviewLength === option}
+                    onClick={() => setInterviewLength(option)}
                   />
                 ))}
               </div>
@@ -562,7 +583,8 @@ function Step1Setup({ onStart }) {
               </motion.button>
               {!canStart ? (
                 <p className="mt-2 text-center text-xs text-slate-400">
-                  Fill role, experience, and interview mode to continue.
+                  Fill role, experience, interview mode, and interview length to
+                  continue.
                 </p>
               ) : null}
             </motion.div>

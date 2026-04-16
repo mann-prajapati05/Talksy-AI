@@ -254,7 +254,7 @@ export const analyzeResume= async(req,res) =>{
 
 export const generateQuestions= async(req,res)=>{
     try{
-        let {role,experience,mode,projects,skills,resumeText}=req.body;
+        let {role,experience,mode,projects,skills,resumeText,length}=req.body;
         role=role?.trim();
         experience=experience?.trim();
         mode=mode?.trim();
@@ -265,7 +265,13 @@ export const generateQuestions= async(req,res)=>{
                 message:"role-Experience-mode required.."
             });
         }
-
+        if(!length){
+            length="short";
+        }
+        const noOfQuestions=
+            length==="medium"? 10:
+            length==="long"? 15: 5;
+            
         const user=await User.findById(req.userId);
         if(!user){
             return res.status(404).json({
@@ -312,7 +318,7 @@ export const generateQuestions= async(req,res)=>{
 
         Return questions in the specified JSON format.
         `;
-        const noOfQuestions=5;
+
         if(!userPrompt.trim()){
             return res.status(400).json({
                 success:false,
