@@ -42,11 +42,11 @@ export const login = async(req,res,next) =>{
         })
 
     }catch(err){
-        console.log("Error while login user.." ,err);
+        console.log("Error while login user:", err.message, err.stack);
         return res.status(500).json({
             success:false,
             message:"login failed..",
-            err
+            error: err.message || String(err)
         });
     }
 }
@@ -135,11 +135,11 @@ export const signup=[
                 }
             })
     }catch(err){
-        console.log("Error while user signup..",err);
+        console.log("Error while user signup:", err.message, err.stack);
         return res.status(500).json({
             success:false,
             message:"sign failed..",
-            err
+            error: err.message || String(err)
         });
     }
 }
@@ -186,11 +186,11 @@ export const googleAuth = async(req,res,next) =>{
     })
 
     }catch(err){
-        console.log("Error while continue with google..",err);
+        console.log("Error while continue with google:", err.message, err.stack);
         return res.status(500).json({
             success:false,
             message:"google sign failed..",
-            err
+            error: err.message || String(err)
         });
     }
 }
@@ -203,11 +203,11 @@ export const logout = async(req,res,next)=>{
             message:"logout successful..",
         })
     }catch(err){
-        console.log("Error while logout..",err);
+        console.log("Error while logout:", err.message, err.stack);
         return res.status(500).json({
             success:false,
             message:"logout failed..",
-            err
+            error: err.message || String(err)
         });
     }
 }

@@ -472,11 +472,11 @@ export const generateQuestions= async(req,res)=>{
         });
 
     }catch(err){
-        console.log(err);
+        console.log("Error while preparing interview:", err.message, err.stack);
         return res.status(500).json({
             success:false,
             message:"something went wrong while preparing interview..",
-            err
+            error: err.message || String(err)
         })
     }
 }
@@ -652,8 +652,7 @@ export const finishInterview = async(req,res) =>{
         if(!interview){
             return res.status(404).json({
             success:false,
-            message:"interview not found..",
-            err
+            message:"interview not found.."
         })
         }
 
@@ -704,10 +703,11 @@ export const finishInterview = async(req,res) =>{
         })
 
     }catch(err){
+        console.log("Error finishing interview:", err.message, err.stack);
         return res.status(500).json({
             success:false,
             message:"failed to finish-interview & generate report ..",
-            err
+            error: err.message || String(err)
         })
     }
 }
