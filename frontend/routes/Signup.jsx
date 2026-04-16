@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../src/redux/userSlice";
 axios.defaults.withCredentials = true;
+import { serverUrl } from "../routes/App";
 
 export default function Signup() {
   const dispatch = useDispatch();
@@ -78,7 +79,7 @@ export default function Signup() {
     });
 
     try {
-      const res = await axios.post("http://localhost:8010/auth/signup", {
+      const res = await axios.post(`${serverUrl}/auth/signup`, {
         name: formData.fullName,
         gender: formData.gender,
         email: formData.email,

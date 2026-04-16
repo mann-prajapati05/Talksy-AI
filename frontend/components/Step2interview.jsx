@@ -6,6 +6,7 @@ import Timer from "./Timer";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
+import { serverUrl } from "../routes/App";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -305,7 +306,7 @@ function Step2interview({ interviewData, onFinish }) {
 
     try {
       const result = await axios.post(
-        "http://localhost:8010/interview/submit-answer",
+        `${serverUrl}/interview/submit-answer`,
         {
           interviewId,
           questionIndex: currentIndex,
@@ -348,7 +349,7 @@ function Step2interview({ interviewData, onFinish }) {
 
     try {
       const result = await axios.post(
-        "http://localhost:8010/interview/finish",
+        `${serverUrl}/interview/finish`,
         {
           interviewId,
         },

@@ -6,6 +6,9 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserData } from "../src/redux/userSlice";
 import Profile from "./Profile";
+
+export const serverUrl = "http://localhost:8010";
+
 function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -20,10 +23,9 @@ function App() {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:8010/users/current-user",
-          { withCredentials: true },
-        );
+        const res = await axios.get(`${serverUrl}/users/current-user`, {
+          withCredentials: true,
+        });
         dispatch(setUserData(res.data));
         console.log(res.data);
       } catch (err) {

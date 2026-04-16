@@ -3,6 +3,7 @@ import { Check, Sparkles } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setUserData } from "../src/redux/userSlice";
+import { serverUrl } from "../routes/App";
 
 const plans = [
   {
@@ -171,7 +172,7 @@ function Pricing() {
       const amount = Number.isFinite(plan?.amount) ? plan.amount : 0;
 
       const orderResponse = await axios.post(
-        "http://localhost:8010/payment/order",
+        `${serverUrl}/payment/order`,
         {
           planId: plan.id,
           amount,
@@ -191,7 +192,7 @@ function Pricing() {
         order_id: orderData.id,
         handler: async (response) => {
           const verifyPay = await axios.post(
-            "http://localhost:8010/payment/verify-payment",
+            `${serverUrl}/payment/verify-payment`,
             {
               razorpayOrderId: response.razorpay_order_id,
               razorpayPaymentId: response.razorpay_payment_id,

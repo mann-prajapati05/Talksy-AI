@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setUserData } from "../src/redux/userSlice";
 import axios from "axios";
+import { serverUrl } from "../routes/App";
 
 const backdropVariants = {
   hidden: { opacity: 0 },
@@ -59,7 +60,7 @@ const Profile = ({ isOpen = false, onClose = () => {} }) => {
   }, [userData]);
 
   const handleLogout = async () => {
-    await axios.get("http://localhost:8010/auth/logout", {
+    await axios.get(`${serverUrl}/auth/logout`, {
       withCredentials: true,
     });
     dispatch(setUserData(null));

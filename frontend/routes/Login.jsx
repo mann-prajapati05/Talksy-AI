@@ -6,6 +6,7 @@ import { auth, provider } from "../src/utils/firebase";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../src/redux/userSlice";
 axios.defaults.withCredentials = true;
+import { serverUrl } from "../routes/App";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -54,7 +55,7 @@ const Login = () => {
 
     console.log("Login attempt:", { email, password });
     try {
-      const res = await axios.post("http://localhost:8010/auth/login", {
+      const res = await axios.post(`${serverUrl}/auth/login`, {
         email,
         password,
       });
@@ -73,7 +74,7 @@ const Login = () => {
       const result = await signInWithPopup(auth, provider);
       console.log(result);
 
-      const res = await axios.post("http://localhost:8010/auth/google", {
+      const res = await axios.post(`${serverUrl}/auth/google`, {
         name: result.user.displayName,
         email: result.user.email,
       });

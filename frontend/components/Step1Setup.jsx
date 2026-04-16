@@ -5,6 +5,7 @@ import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { setUserData } from "../src/redux/userSlice";
 import { useNavigate } from "react-router-dom";
+import { serverUrl } from "../routes/App";
 
 const EXPERIENCE_OPTIONS = ["Fresher", "1-3 years", "3+ years"];
 const INTERVIEW_MODES = ["Technical", "HR", "Mixed"];
@@ -152,7 +153,7 @@ function Step1Setup({ onStart }) {
     }
     try {
       const result = await axios.post(
-        "http://localhost:8010/interview/resume-analyze",
+        `${serverUrl}/interview/resume-analyze`,
         formData,
         {
           withCredentials: true,
@@ -227,7 +228,7 @@ function Step1Setup({ onStart }) {
 
     try {
       const result = await axios.post(
-        "http://localhost:8010/interview/generate-questions",
+        `${serverUrl}/interview/generate-questions`,
         {
           role: role.trim(),
           experience,

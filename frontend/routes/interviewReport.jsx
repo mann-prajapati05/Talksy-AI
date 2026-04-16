@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Step3Report from "../components/Step3Report";
+import { serverUrl } from "../routes/App";
 
 function interviewReport() {
   const { interviewId } = useParams();
@@ -11,7 +12,7 @@ function interviewReport() {
     const fetchReport = async () => {
       try {
         const result = await axios.get(
-          `http://localhost:8010/interview/report/${interviewId}`,
+          `${serverUrl}/interview/report/${interviewId}`,
           { withCredentials: true },
         );
         setReport(result.data);

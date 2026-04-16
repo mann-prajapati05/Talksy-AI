@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { serverUrl } from "../routes/App";
 
 const cardVariants = {
   hidden: { opacity: 0, y: 18 },
@@ -84,10 +85,9 @@ function InterviewHistory() {
       setIsLoading(true);
       setError("");
       try {
-        const result = await axios.get(
-          "http://localhost:8010/interview/my-interviews",
-          { withCredentials: true },
-        );
+        const result = await axios.get(`${serverUrl}/interview/my-interviews`, {
+          withCredentials: true,
+        });
         setInterviews(result.data);
       } catch (err) {
         setError("We could not load your interview history right now.");
