@@ -13,7 +13,7 @@ const plans = [
     priceLabel: "Free",
     features: [
       "25 interview credits on signup",
-      "Core SpeakLab access",
+      "Core interview practice access",
       "Basic report insights",
     ],
     badge: "Default Plan",

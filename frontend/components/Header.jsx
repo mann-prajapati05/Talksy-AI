@@ -1,11 +1,8 @@
-import { motion } from "framer-motion";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 function Header({ onProfileClick }) {
-  const location = useLocation();
   const userData = useSelector((state) => state.user.userData);
   const userName = userData?.name?.trim() || "";
   const userCredits = Number(userData?.credits ?? 0);
@@ -17,16 +14,6 @@ function Header({ onProfileClick }) {
     }
     return userName.charAt(0).toUpperCase();
   }, [userName]);
-
-  const activeHeaderTab = useMemo(() => {
-    if (location.pathname.startsWith("/speak-lab")) {
-      return "speakLab";
-    }
-    if (location.pathname.startsWith("/mock-hire")) {
-      return "mockHire";
-    }
-    return null;
-  }, [location.pathname]);
 
   return (
     <header className="relative mx-5 mb-5 grid grid-cols-1 items-center gap-4 overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 shadow-[0_18px_45px_rgba(15,23,42,0.35)] backdrop-blur-xl md:grid-cols-[auto_1fr_auto] md:gap-4">
@@ -46,58 +33,6 @@ function Header({ onProfileClick }) {
           </span>
         </Link>
       </div>
-
-      <nav
-        className="relative z-10 inline-flex items-center justify-self-center gap-2 rounded-full border border-white/10 bg-slate-900/40 p-1"
-        aria-label="Primary"
-      >
-        <Link to="/speak-lab">
-          <button
-            className="relative rounded-full px-4 py-2 text-sm font-medium transition-all duration-300"
-            type="button"
-          >
-            {activeHeaderTab === "speakLab" && (
-              <motion.span
-                layoutId="header-tab-indicator"
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="absolute inset-0 rounded-full bg-linear-to-r from-indigo-600 to-violet-600 shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_10px_24px_rgba(79,70,229,0.35)]"
-              />
-            )}
-            <span
-              className={`relative z-10 ${
-                activeHeaderTab === "speakLab"
-                  ? "text-white"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              SpeakLab
-            </span>
-          </button>
-        </Link>
-        <Link to="/mock-hire">
-          <button
-            className="relative rounded-full px-4 py-2 text-sm font-medium transition-all duration-300"
-            type="button"
-          >
-            {activeHeaderTab === "mockHire" && (
-              <motion.span
-                layoutId="header-tab-indicator"
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="absolute inset-0 rounded-full bg-linear-to-r from-indigo-600 to-violet-600 shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_10px_24px_rgba(79,70,229,0.35)]"
-              />
-            )}
-            <span
-              className={`relative z-10 ${
-                activeHeaderTab === "mockHire"
-                  ? "text-white"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              MockHire
-            </span>
-          </button>
-        </Link>
-      </nav>
 
       <div className="relative z-10 inline-flex flex-wrap items-center justify-center gap-2 md:justify-end">
         {!isLoggedIn ? (

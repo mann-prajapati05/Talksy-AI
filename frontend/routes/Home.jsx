@@ -25,10 +25,6 @@ function ActionCard({ title, description, cta, icon, onClick }) {
 function Home() {
   const navigate = useNavigate();
 
-  const handleSpeakStart = () => {
-    navigate("/speak-lab");
-  };
-
   const handleInterviewStart = () => {
     navigate("/mock-hire");
   };
@@ -50,29 +46,7 @@ function Home() {
         </p>
       </header>
 
-      <div className="relative z-10 mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        <ActionCard
-          title="SpeakLab"
-          description="Practice everyday communication with AI"
-          cta="Start Speaking"
-          onClick={handleSpeakStart}
-          icon={
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-4l-4 4v-4z"
-              />
-            </svg>
-          }
-        />
-
+      <div className="relative z-10 mt-10 grid gap-5 md:grid-cols-2">
         <ActionCard
           title="MockHire"
           description="Simulate real job interviews based on your resume"
