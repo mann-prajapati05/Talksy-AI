@@ -11,9 +11,25 @@ import paymentRouter from './routes/paymentRouter.js';
 dotenv.config();
 const app=express();
 
+const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    "https://talksy-ai-frontend.onrender.com",
+    "http://localhost:5173",
+].filter(Boolean);
+
 app.use(cors({
-    origin: "https://talksy-ai-frontend.onrender.com", 
-    credentials: true                
+    origin: (origin, callback) => {
+        if (!origin) {
+            return callback(null, true);
+        }
+
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true
 }));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
