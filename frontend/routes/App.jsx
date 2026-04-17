@@ -7,12 +7,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUserData } from "../src/redux/userSlice";
 import Profile from "./Profile";
 import { AnimatePresence, motion } from "framer-motion";
+import {
+  applySessionAuthHeader,
+  clearSessionToken,
+} from "../src/utils/authSession";
 
 export const serverUrl = "https://talksy-ai.onrender.com";
 
 const pageTransition = {
   initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeOut" } },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.35, ease: "easeOut" },
+  },
   exit: { opacity: 0, y: -8, transition: { duration: 0.2, ease: "easeIn" } },
 };
 
@@ -37,6 +45,8 @@ function App() {
         console.log(res.data);
       } catch (err) {
         console.log("Error while getting user", err);
+        clearSessionToken();
+        applySessionAuthHeader("");
         dispatch(setUserData(null));
       }
     };
@@ -70,8 +80,8 @@ function App() {
                         ⚡ Unlock MockHire with more credits
                       </p>
                       <p className="mt-1 text-xs text-amber-700 sm:text-sm">
-                        You have {userCredits} credits. You need at least 20 credits
-                        to access MockHire interviews.
+                        You have {userCredits} credits. You need at least 20
+                        credits to access MockHire interviews.
                       </p>
                     </div>
                     <motion.button

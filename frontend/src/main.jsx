@@ -11,6 +11,9 @@ import MockHire from "../routes/MockHire.jsx";
 import InterviewHistory from "../routes/InterviewHistory.jsx";
 import InterviewReport from "../routes/InterviewReport.jsx";
 import Pricing from "../routes/Pricing.jsx";
+import { bootstrapSessionAuth } from "./utils/authSession";
+
+bootstrapSessionAuth();
 
 const router = createBrowserRouter([
   {
