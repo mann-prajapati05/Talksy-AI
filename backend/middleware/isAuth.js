@@ -1,16 +1,21 @@
 import jwt from 'jsonwebtoken'
 const isAuth =(req,res,next) =>{
     try{
-        const {userToken} = req.cookies;
+        const { userToken } = req.cookies;
+        const authHeader = req.headers.authorization || "";
+        const bearerToken = authHeader.startsWith("Bearer ")
+            ? authHeader.slice(7).trim()
+            : "";
+        const token = userToken || bearerToken;
 
-        if(!userToken){
+        if(!token){
             return res.status(403).json({
                 success:false,
                 message:"Bad Request un-Authorised access..",
             })
         }
 
-        const decoded = jwt.verify(userToken,process.env.JWT_SECRET);
+        const decoded = jwt.verify(token,process.env.JWT_SECRET);
         if(!decoded){
             return res.status(403).json({
                 success:false,
