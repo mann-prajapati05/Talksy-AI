@@ -5,6 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { setUserData } from "../src/redux/userSlice";
 import axios from "axios";
 import { serverUrl } from "../routes/App";
+import {
+  applySessionAuthHeader,
+  clearSessionToken,
+} from "../src/utils/authSession";
 
 const backdropVariants = {
   hidden: { opacity: 0 },
@@ -66,6 +70,8 @@ const Profile = ({ isOpen = false, onClose = () => {} }) => {
 
   const handleLogout = async () => {
     await axios.get(`${serverUrl}/auth/logout`, { withCredentials: true });
+    clearSessionToken();
+    applySessionAuthHeader("");
     dispatch(setUserData(null));
     navigate("/login");
   };

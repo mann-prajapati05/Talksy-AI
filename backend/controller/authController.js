@@ -33,6 +33,7 @@ export const login = async(req,res,next) =>{
         return res.status(200).json({
             success:true,
             message:"Login successfully..",
+            token,
             user:{
                     name:user.name,
                     email:user.email,
@@ -127,6 +128,7 @@ export const signup=[
             return res.status(201).json({
                 success:true,
                 message:"sign successfully..",
+                token,
                 user:{
                     name:user.name,
                     email:user.email,
@@ -177,6 +179,7 @@ export const googleAuth = async(req,res,next) =>{
     return res.status(201).json({
         success:true,
         message:"Google sign successfully..",
+        token,
         user:{
             name:user.name,
             email:user.email,
