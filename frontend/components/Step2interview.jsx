@@ -127,9 +127,29 @@ function Step2interview({ interviewData, onFinish }) {
       waitForVoices().then(() => {
         window.speechSynthesis.cancel();
         const clean = (text || "").trim().replace(/\s+/g, " ");
+        if (!clean) {
+          resolve();
+          return;
+        }
         const human = clean.replace(/,/g, ", ...").replace(/\./g, ". ... ");
         const u = new SpeechSynthesisUtterance(human);
         const v = getPreferredVoice();
+        let isResolved = false;
+        let fallbackTimer = null;
+
+        const safeResolve = () => {
+          if (isResolved) return;
+          isResolved = true;
+          if (fallbackTimer) clearTimeout(fallbackTimer);
+          setIsAiPlaying(false);
+          setSubtitle("");
+          if (videoRef.current) {
+            videoRef.current.pause();
+            videoRef.current.currentTime = 0;
+          }
+          resolve();
+        };
+
         if (v) u.voice = v;
         u.rate = 0.92;
         u.pitch = 1.05;
@@ -137,24 +157,24 @@ function Step2interview({ interviewData, onFinish }) {
         u.onstart = () => {
           setIsAiPlaying(true);
           stopMic();
-          videoRef.current?.play();
+          videoRef.current?.play()?.catch(() => {});
         };
         u.onend = () => {
-          videoRef.current?.pause();
-          if (videoRef.current) videoRef.current.currentTime = 0;
-          setIsAiPlaying(false);
           if (isMicOn && !isIntroPhase) startMic();
-          setTimeout(() => {
-            setSubtitle("");
-            resolve();
-          }, 300);
+          setTimeout(() => safeResolve(), 200);
         };
         u.onerror = () => {
-          setIsAiPlaying(false);
-          setSubtitle("");
-          resolve();
+          safeResolve();
         };
         setSubtitle(clean);
+        const estimatedMs = Math.max(
+          2200,
+          Math.min(16000, clean.split(" ").length * 450 + 2000),
+        );
+        fallbackTimer = setTimeout(() => {
+          window.speechSynthesis.cancel();
+          safeResolve();
+        }, estimatedMs);
         window.speechSynthesis.speak(u);
       });
     });
