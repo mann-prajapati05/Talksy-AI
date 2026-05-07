@@ -3,7 +3,6 @@ import "./SplashScreen.css";
 
 const SPLASH_STORAGE_KEY = "talksy_splash_seen_v1";
 const FORWARD_DURATION = 2000;
-const REVERSE_DURATION = 1800;
 const EXIT_DURATION = 700;
 
 function SplashScreen() {
@@ -23,23 +22,15 @@ function SplashScreen() {
 
     window.sessionStorage.setItem(SPLASH_STORAGE_KEY, "true");
 
-    const reverseTimer = window.setTimeout(() => {
-      setPhase("reverse");
-    }, FORWARD_DURATION);
-
     const exitTimer = window.setTimeout(() => {
       setPhase("exit");
-    }, FORWARD_DURATION + REVERSE_DURATION);
+    }, FORWARD_DURATION);
 
-    const hideTimer = window.setTimeout(
-      () => {
-        setIsVisible(false);
-      },
-      FORWARD_DURATION + REVERSE_DURATION + EXIT_DURATION,
-    );
+    const hideTimer = window.setTimeout(() => {
+      setIsVisible(false);
+    }, FORWARD_DURATION + EXIT_DURATION);
 
     return () => {
-      window.clearTimeout(reverseTimer);
       window.clearTimeout(exitTimer);
       window.clearTimeout(hideTimer);
     };

@@ -46,10 +46,6 @@
   animation: Textanimation 2s ease-in-out forwards;
 }
 
-.splash-screen--reverse .splash-screen__logo path {
-  animation: Textanimation 1.8s ease-in-out reverse forwards;
-}
-
 .splash-screen__label {
   margin: 0;
   color: #fff;
@@ -66,15 +62,11 @@
 @keyframes Textanimation {
   0% {
     stroke-dashoffset: 200;
+    fill: transparent;
   }
-
-  80% {
-     fill: transparent; 
-  }
-
   100% {
-    fill: white;
     stroke-dashoffset: 0;
+    fill: white;
   }
 }
 
