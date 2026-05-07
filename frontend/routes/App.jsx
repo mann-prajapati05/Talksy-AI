@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUserData } from "../src/redux/userSlice";
 import Profile from "./Profile";
 import { AnimatePresence, motion } from "framer-motion";
+import SplashScreen from "../components/SplashScreen/SplashScreen";
 import {
   applySessionAuthHeader,
   clearSessionToken,
@@ -55,6 +56,7 @@ function App() {
 
   return (
     <>
+      <SplashScreen />
       <main className="relative min-h-screen bg-gradient-to-br from-white via-slate-50/80 to-indigo-50/30 font-sans text-slate-900 overflow-x-hidden">
         {/* Ambient background blobs */}
         <div className="ambient-blob ambient-blob-1" />
