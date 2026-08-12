@@ -1,2 +1,20 @@
-.venv
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment variables
 .env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db

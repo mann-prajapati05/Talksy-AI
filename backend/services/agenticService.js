@@ -7,32 +7,55 @@
  * - Handle network errors
  * - Validate responses
  * - Return clean data to controllers
+ * - Auto-retry on 502/timeout to handle Render free tier cold starts
  */
 
 import axios from 'axios';
 
-const AGENTIC_SERVICE_URL = process.env.AGENTIC_SERVICE_URL || 'http://localhost:8000';
+let AGENTIC_SERVICE_URL = (process.env.AGENTIC_SERVICE_URL || 'http://localhost:8000').trim().replace(/\/+$/, '');
 const TIMEOUT_MS = 120_000; // 120 seconds — LLM calls can be slow
+
+// Retry configuration to handle Render free tier cold starts (up to 2 minutes)
+const RETRY_ATTEMPTS = 8;
+const RETRY_DELAY_MS = 15_000; // 15 seconds
+
+/**
+ * Helper to call an API function with automatic retries on 502 Bad Gateway or timeouts.
+ */
+async function callWithRetry(apiCallFn, retries = RETRY_ATTEMPTS, delay = RETRY_DELAY_MS) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            return await apiCallFn();
+        } catch (err) {
+            const is502 = err.response?.status === 502;
+            const isTimeout = err.code === 'ECONNABORTED' || err.message?.includes('timeout');
+            const isNetworkError = !err.response && err.request; // Server didn't respond at all
+
+            const shouldRetry = (is502 || isTimeout || isNetworkError) && attempt < retries;
+
+            if (shouldRetry) {
+                console.log(`[AgenticService] Request failed (${err.message || 'Network error'}). Render instance might be asleep. Retrying in ${delay / 1000}s... (Attempt ${attempt}/${retries})`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                continue;
+            }
+            throw err;
+        }
+    }
+}
 
 /**
  * Start an agentic interview — generates the first question.
  *
  * @param {Object} data - Candidate/interview context
- * @param {string} data.role
- * @param {string} data.experience
- * @param {string} data.mode
- * @param {string} data.skills
- * @param {string} data.projects
- * @param {string} data.exp
- * @param {string} data.resumeText
  * @returns {Promise<Object>} { success, next_question }
  */
 export async function startInterview(data) {
-    console.log('[AgenticService] start request');
+    const url = `${AGENTIC_SERVICE_URL}/api/v1/interview/start`;
+    console.log(`[AgenticService] start request to: ${url}`);
 
-    try {
+    const apiCall = async () => {
         const response = await axios.post(
-            `${AGENTIC_SERVICE_URL}/api/v1/interview/start`,
+            url,
             {
                 role: data.role,
                 experience: data.experience,
@@ -45,15 +68,23 @@ export async function startInterview(data) {
             { timeout: TIMEOUT_MS }
         );
 
-        console.log('[AgenticService] start response received');
+        console.log('[AgenticService] start response received successfully');
 
         if (!response.data || !response.data.success || !response.data.next_question) {
             throw new Error('Invalid response from agentic service');
         }
 
         return response.data;
+    };
+
+    try {
+        return await callWithRetry(apiCall);
     } catch (err) {
-        console.error('[AgenticService] start request failed:', err.message);
+        console.error('[AgenticService] start request failed permanently:', err.message);
+        if (err.response) {
+            console.error('[AgenticService] Error Response Status:', err.response.status);
+            console.error('[AgenticService] Error Response Data:', err.response.data);
+        }
 
         if (err.code === 'ECONNREFUSED') {
             throw new Error('Agentic AI service is unavailable. Please try again later.');
@@ -69,34 +100,19 @@ export async function startInterview(data) {
     }
 }
 
-
 /**
  * Process a candidate answer — evaluates and generates next question.
  *
  * @param {Object} data
- * @param {string} data.interviewId
- * @param {Object} data.cur_question
- * @param {string} data.cur_answer
- * @param {string|null} data.prev_summary
- * @param {boolean} data.follow_up_allowed
- * @param {string} data.follow_up_context
- * @param {number} data.follow_up_cnt
- * @param {number} data.follow_up_score
- * @param {string} data.recent_topic
- * @param {string} data.topic_coverage
- * @param {string} data.next_focus
- * @param {string} data.next_topic
- * @param {string} data.next_difficulty
- * @param {string} data.next_question_type
- * @param {Object} data.candidate - { role, experience, mode, skills, projects, exp, resumeText }
  * @returns {Promise<Object>} { success, next_question, evaluation, strategy, summary }
  */
 export async function processAnswer(data) {
-    console.log('[AgenticService] answer request');
+    const url = `${AGENTIC_SERVICE_URL}/api/v1/interview/answer`;
+    console.log(`[AgenticService] answer request to: ${url}`);
 
-    try {
+    const apiCall = async () => {
         const response = await axios.post(
-            `${AGENTIC_SERVICE_URL}/api/v1/interview/answer`,
+            url,
             {
                 interviewId: data.interviewId || '',
 
@@ -123,15 +139,23 @@ export async function processAnswer(data) {
             { timeout: TIMEOUT_MS }
         );
 
-        console.log('[AgenticService] answer response received');
+        console.log('[AgenticService] answer response received successfully');
 
         if (!response.data || !response.data.success) {
             throw new Error('Invalid response from agentic service');
         }
 
         return response.data;
+    };
+
+    try {
+        return await callWithRetry(apiCall);
     } catch (err) {
-        console.error('[AgenticService] answer request failed:', err.message);
+        console.error('[AgenticService] answer request failed permanently:', err.message);
+        if (err.response) {
+            console.error('[AgenticService] Error Response Status:', err.response.status);
+            console.error('[AgenticService] Error Response Data:', err.response.data);
+        }
 
         if (err.code === 'ECONNREFUSED') {
             throw new Error('Agentic AI service is unavailable. Please try again later.');
