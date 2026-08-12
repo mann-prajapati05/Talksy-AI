@@ -125,6 +125,7 @@ function Step1Setup({ onStart }) {
     if (hasInsufficientCredits) { setCreditError("Need at least 20 credits to start MockHire."); setLoading(false); return; }
     setCreditError("");
     try {
+<<<<<<< HEAD
       if (interviewType === "agentic") {
         // === Agentic flow: one question at a time ===
         const result = await axios.post(`${serverUrl}/interview/agentic/start`, {
@@ -151,6 +152,14 @@ function Step1Setup({ onStart }) {
         setLoading(false);
         onStart(result.data);
       }
+=======
+      const result = await axios.post(`${serverUrl}/interview/generate-questions`, {
+        role: role.trim(), experience, mode, length: interviewLength, projects, skills, resumeText,
+      }, { withCredentials: true });
+      if (userData) dispatch(setUserData({ ...userData, credits: result.data.creditsLeft }));
+      setLoading(false);
+      onStart(result.data);
+>>>>>>> 89ce66c2943ec0d9384582244c587c26344b40f4
     } catch (err) {
       const msg = err?.response?.data?.message || "";
       if (msg.toLowerCase().includes("credit")) setCreditError("Need at least 20 credits.");
@@ -180,6 +189,7 @@ function Step1Setup({ onStart }) {
             <motion.div variants={fadeUp}>
               <SectionLabel title="Experience" hint="Pick the closest level" />
               <div className="flex flex-wrap gap-3">{EXPERIENCE_OPTIONS.map((o) => <OptionButton key={o} label={o} active={experience === o} onClick={() => setExperience(o)} />)}</div>
+<<<<<<< HEAD
             </motion.div>
 
             <motion.div variants={fadeUp}>
@@ -203,6 +213,20 @@ function Step1Setup({ onStart }) {
               )}
             </motion.div>
 
+=======
+            </motion.div>
+
+            <motion.div variants={fadeUp}>
+              <SectionLabel title="Interview Mode" />
+              <div className="grid gap-3 sm:grid-cols-3">{INTERVIEW_MODES.map((o) => <OptionButton key={o} label={o} active={mode === o} onClick={() => setMode(o)} />)}</div>
+            </motion.div>
+
+            <motion.div variants={fadeUp}>
+              <SectionLabel title="Interview Length" />
+              <div className="grid gap-3 sm:grid-cols-3">{INTERVIEW_LENGTH_OPTIONS.map((o) => <OptionButton key={o} label={o} active={interviewLength === o} onClick={() => setInterviewLength(o)} />)}</div>
+            </motion.div>
+
+>>>>>>> 89ce66c2943ec0d9384582244c587c26344b40f4
             <motion.div variants={fadeUp} className="rounded-xl border border-slate-200/60 bg-gradient-to-br from-slate-50 to-indigo-50/20 p-4 sm:p-5">
               <SectionLabel title="Resume Analysis" hint="Personalize with AI" />
               <label
