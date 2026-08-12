@@ -191,7 +191,7 @@ function Step2interview({ interviewData, onFinish }) {
         setSubtitle(clean);
         const estimatedMs = Math.max(
           2200,
-          Math.min(16000, clean.split(" ").length * 450 + 2000),
+          Math.min(90000, clean.split(" ").length * 600 + 5000),
         );
         fallbackTimer = setTimeout(() => {
           window.speechSynthesis.cancel();
