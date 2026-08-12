@@ -9,7 +9,7 @@ const questionsSchema = new mongoose.Schema({
     },
     questionType:{
         type:String,
-        enum:["Technical","Behavioral","Project","Scenario"]
+        enum:["Technical","Behavioral","Project","Scenario","Situational","Hr"]
     },
     timeLimit:Number,
     answer:String,
@@ -45,7 +45,7 @@ const interviewSchema= new mongoose.Schema({
     experience:{
         type:String,
         required:true,
-        enum:['Fresher',"1-3 years","3+ years"],
+        enum:['Fresher',"1-3 years","3+ years","Junior","Mid","Senior"],
     },
     mode:{
         type:String,
@@ -62,6 +62,19 @@ const interviewSchema= new mongoose.Schema({
         type:String,
         enum:["Incompleted","completed"],
         default:"Incompleted"
+    },
+    // === Agentic interview fields (optional) ===
+    interviewType:{
+        type:String,
+        enum:["classic","agentic"],
+        default:"classic"
+    },
+    totalQuestions:{
+        type:Number,
+    },
+    agenticState:{
+        type:mongoose.Schema.Types.Mixed,
+        default:null,
     }
 
 },{timestamps:true});

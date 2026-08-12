@@ -13,7 +13,7 @@ import {
   clearSessionToken,
 } from "../src/utils/authSession";
 
-export const serverUrl = "https://talksy-ai.onrender.com";
+export const serverUrl = window.location.hostname === "localhost" ? "http://localhost:8010" : "https://talksy-ai.onrender.com";
 
 const pageTransition = {
   initial: { opacity: 0, y: 12 },

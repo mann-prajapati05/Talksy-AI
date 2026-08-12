@@ -3,6 +3,7 @@ import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { askAi } from '../services/openRouter.service.js';
 import Interview from '../model/interviewModel.js';
 import User from '../model/user.js';
+import { startInterview as agenticStart, processAnswer as agenticProcessAnswer } from '../services/agenticService.js';
 
 export function parseAndValidateQuestions(aiResponse) {
     if (!aiResponse || typeof aiResponse !== "string") {
@@ -773,3 +774,327 @@ export const getInterviewReport = async(req,res)=>{
         });
     }
 }
+
+
+// ===========================================================
+// AGENTIC INTERVIEW CONTROLLERS
+// ===========================================================
+
+/**
+ * Start an agentic interview — calls FastAPI to generate the first question,
+ * creates the Interview record with that single question, deducts credits.
+ *
+ * POST /interview/agentic/start
+ */
+export const startAgenticInterview = async (req, res) => {
+    try {
+        let { role, experience, mode, projects, skills, resumeText, length } = req.body;
+        role = role?.trim();
+        experience = experience?.trim();
+        mode = mode?.trim();
+
+        if (!role || !experience || !mode) {
+            return res.status(400).json({
+                success: false,
+                message: "role, experience, and mode are required."
+            });
+        }
+
+        if (!length) length = "short";
+        const totalQuestions =
+            length === "medium" ? 10 :
+            length === "long" ? 15 : 5;
+
+        // --- User & credits ---
+        const user = await User.findById(req.userId);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
+            });
+        }
+        if (user.credits < 20) {
+            return res.status(400).json({
+                success: false,
+                message: "Not enough credits, minimum 20 credits required."
+            });
+        }
+
+        const projectText = Array.isArray(projects) && projects.length
+            ? projects.join(", ")
+            : "None";
+        const skillText = Array.isArray(skills) && skills.length
+            ? skills.join(", ")
+            : "None";
+        const safeResume = resumeText?.trim() || "None";
+
+        // --- Call FastAPI agentic service ---
+        const agenticResult = await agenticStart({
+            role,
+            experience,
+            mode,
+            skills: skillText,
+            projects: projectText,
+            exp: experience,
+            resumeText: safeResume,
+        });
+
+        const firstQuestion = agenticResult.next_question;
+
+        // Capitalize difficulty and questionType for DB compatibility
+        const capitalize = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s;
+
+        // --- Create interview record ---
+        const interview = await Interview.create({
+            userId: req.userId,
+            role,
+            experience,
+            mode,
+            resumeText: safeResume,
+            interviewType: "agentic",
+            totalQuestions,
+            questions: [{
+                question: firstQuestion.question,
+                difficulty: capitalize(firstQuestion.difficulty),
+                questionType: capitalize(firstQuestion.questionType),
+                timeLimit: firstQuestion.timeLimit,
+            }],
+            agenticState: {
+                prev_summary: null,
+                follow_up_allowed: false,
+                follow_up_context: "",
+                follow_up_cnt: 0,
+                follow_up_score: 0,
+                recent_topic: "",
+                topic_coverage: "",
+                next_focus: "initial_assessment",
+                next_topic: "core fundamentals",
+                next_difficulty: firstQuestion.difficulty,
+                next_question_type: firstQuestion.questionType,
+                skills: skillText,
+                projects: projectText,
+                exp: experience,
+                resumeText: safeResume,
+            }
+        });
+
+        // --- Deduct credits ---
+        user.credits -= 20;
+        await user.save();
+
+        console.log(`[Agentic] Interview started: ${interview._id}`);
+
+        return res.status(200).json({
+            success: true,
+            interviewId: interview._id,
+            creditsLeft: user.credits,
+            userName: user.name,
+            totalQuestions,
+            question: {
+                question: firstQuestion.question,
+                difficulty: capitalize(firstQuestion.difficulty),
+                questionType: capitalize(firstQuestion.questionType),
+                timeLimit: firstQuestion.timeLimit,
+            },
+            questionIndex: 0,
+            isLastQuestion: totalQuestions <= 1,
+        });
+
+    } catch (err) {
+        console.error("[Agentic] startAgenticInterview error:", err);
+        return res.status(500).json({
+            success: false,
+            message: err.message || "Failed to start agentic interview."
+        });
+    }
+};
+
+
+/**
+ * Submit an answer for an agentic interview — calls FastAPI to evaluate
+ * the answer AND generate the next adaptive question.
+ *
+ * POST /interview/agentic/answer
+ */
+export const submitAgenticAnswer = async (req, res) => {
+    try {
+        const { interviewId, answer } = req.body;
+
+        if (!interviewId || !answer) {
+            return res.status(400).json({
+                success: false,
+                message: "interviewId and answer are required."
+            });
+        }
+
+        const interview = await Interview.findById(interviewId);
+        if (!interview) {
+            return res.status(404).json({
+                success: false,
+                message: "Interview not found."
+            });
+        }
+        if (String(interview.userId) !== String(req.userId)) {
+            return res.status(403).json({
+                success: false,
+                message: "Unauthorized."
+            });
+        }
+        if (interview.status === "completed") {
+            return res.status(400).json({
+                success: false,
+                message: "This interview is already completed."
+            });
+        }
+
+        // --- Determine current question index ---
+        const currentQIndex = interview.questions.length - 1;
+        const currentQ = interview.questions[currentQIndex];
+
+        if (!currentQ) {
+            return res.status(400).json({
+                success: false,
+                message: "No question to answer."
+            });
+        }
+
+        // --- Restore agentic state ---
+        const agState = interview.agenticState || {};
+
+        const isLastAnswer = (currentQIndex + 1) >= interview.totalQuestions;
+
+        // --- Call FastAPI agentic service ---
+        const agenticResult = await agenticProcessAnswer({
+            interviewId: String(interview._id),
+
+            cur_question: {
+                question: currentQ.question,
+                difficulty: currentQ.difficulty?.toLowerCase() || "easy",
+                questionType: currentQ.questionType?.toLowerCase() || "technical",
+                timeLimit: currentQ.timeLimit || 60,
+            },
+            cur_answer: answer,
+
+            prev_summary: agState.prev_summary || null,
+
+            follow_up_allowed: agState.follow_up_allowed || false,
+            follow_up_context: agState.follow_up_context || "",
+            follow_up_cnt: agState.follow_up_cnt || 0,
+            follow_up_score: agState.follow_up_score || 0,
+
+            recent_topic: agState.recent_topic || "",
+            topic_coverage: agState.topic_coverage || "",
+
+            next_focus: agState.next_focus || "initial_assessment",
+            next_topic: agState.next_topic || "",
+            next_difficulty: agState.next_difficulty || "easy",
+            next_question_type: agState.next_question_type || "technical",
+
+            candidate: {
+                role: interview.role,
+                experience: interview.experience,
+                mode: interview.mode,
+                skills: agState.skills || "",
+                projects: agState.projects || "",
+                exp: agState.exp || "",
+                resumeText: agState.resumeText || interview.resumeText || "",
+            }
+        });
+
+        const evaluation = agenticResult.evaluation;
+        const nextQuestion = agenticResult.next_question;
+        const strategy = agenticResult.strategy;
+
+        // --- Save answer & evaluation to current question ---
+        currentQ.answer = answer;
+        currentQ.feedback = evaluation.overall_feedback;
+        currentQ.score = evaluation.overall_score;
+        currentQ.confidence = evaluation.confidence_score;
+        currentQ.communication = evaluation.communication_score;
+        currentQ.correctness = evaluation.correctness_score;
+
+        const capitalize = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s;
+
+        // --- If not the last answer, append the next question ---
+        if (!isLastAnswer && nextQuestion) {
+            interview.questions.push({
+                question: nextQuestion.question,
+                difficulty: capitalize(nextQuestion.difficulty),
+                questionType: capitalize(nextQuestion.questionType),
+                timeLimit: nextQuestion.timeLimit,
+            });
+        }
+
+        // --- Update agentic state ---
+        interview.agenticState = {
+            ...agState,
+            prev_summary: agenticResult.summary || agState.prev_summary,
+            follow_up_allowed: strategy.follow_up_allowed,
+            follow_up_context: strategy.follow_up_context,
+            follow_up_cnt: strategy.follow_up_cnt,
+            follow_up_score: strategy.follow_up_score,
+            recent_topic: strategy.recent_topic,
+            topic_coverage: strategy.topic_coverage,
+            next_focus: strategy.next_focus,
+            next_topic: strategy.next_topic,
+            next_difficulty: strategy.next_difficulty,
+            next_question_type: strategy.next_question_type,
+        };
+
+        // --- If last answer, finish the interview ---
+        if (isLastAnswer) {
+            const answered = interview.questions.filter(q => q.answer);
+            const totalAnswered = answered.length;
+            let totalScore = 0;
+            answered.forEach(q => { totalScore += (q.score || 0); });
+            interview.finalScore = totalAnswered > 0
+                ? Number((totalScore / totalAnswered).toFixed(2))
+                : 0;
+            interview.status = "completed";
+        }
+
+        interview.markModified('agenticState');
+        await interview.save();
+
+        console.log(`[Agentic] Answer processed for interview ${interviewId}, Q${currentQIndex + 1}`);
+
+        // --- Build response ---
+        const responseData = {
+            success: true,
+            feedback: {
+                overall_feedback: evaluation.overall_feedback,
+                overall_score: evaluation.overall_score,
+                confidence_feedback: evaluation.confidence_feedback,
+                confidence_score: evaluation.confidence_score,
+                communication_feedback: evaluation.communication_feedback,
+                communication_score: evaluation.communication_score,
+                correctness_feedback: evaluation.correctness_feedback,
+                correctness_score: evaluation.correctness_score,
+            },
+            questionIndex: currentQIndex + 1,
+            isLastQuestion: isLastAnswer,
+        };
+
+        if (!isLastAnswer && nextQuestion) {
+            responseData.nextQuestion = {
+                question: nextQuestion.question,
+                difficulty: capitalize(nextQuestion.difficulty),
+                questionType: capitalize(nextQuestion.questionType),
+                timeLimit: nextQuestion.timeLimit,
+            };
+        }
+
+        if (isLastAnswer) {
+            responseData.finalScore = interview.finalScore;
+        }
+
+        return res.status(200).json(responseData);
+
+    } catch (err) {
+        console.error("[Agentic] submitAgenticAnswer error:", err);
+        return res.status(500).json({
+            success: false,
+            message: err.message || "Failed to process answer."
+        });
+    }
+};

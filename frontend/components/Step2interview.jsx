@@ -38,7 +38,25 @@ const questionVariants = {
 };
 
 function Step2interview({ interviewData, onFinish }) {
-  const { interviewId, userName, questions } = interviewData;
+  // === Detect interview mode ===
+  const isAgentic = interviewData.interviewType === "agentic";
+
+  // Classic mode destructuring
+  const classicQuestions = interviewData.questions || [];
+  const { interviewId, userName } = interviewData;
+
+  // Agentic mode state
+  const [agenticQuestion, setAgenticQuestion] = useState(
+    isAgentic ? interviewData.question : null
+  );
+  const [agenticTotalQuestions, setAgenticTotalQuestions] = useState(
+    isAgentic ? interviewData.totalQuestions : 0
+  );
+  const [agenticIsLast, setAgenticIsLast] = useState(
+    isAgentic ? interviewData.isLastQuestion : false
+  );
+
+  // Common state
   const maleVideo = "/male-ai.mp4";
   const femaleVideo = "/female-ai.mp4";
   const userData = useSelector((state) => state.user);
@@ -49,7 +67,10 @@ function Step2interview({ interviewData, onFinish }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState("");
-  const [timeLeft, setTimeLeft] = useState(questions[0]?.timeLimit || 60);
+  const currentQuestionObj = isAgentic
+    ? agenticQuestion
+    : classicQuestions[currentIndex];
+  const [timeLeft, setTimeLeft] = useState(currentQuestionObj?.timeLimit || 60);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [voiceGender, setVoiceGender] = useState(userData?.gender || "female");
   const [subtitle, setSubtitle] = useState("");
@@ -70,7 +91,8 @@ function Step2interview({ interviewData, onFinish }) {
     }
   };
 
-  const currentQuestion = questions[currentIndex];
+  const currentQuestion = isAgentic ? agenticQuestion : classicQuestions[currentIndex];
+  const totalQuestionsCount = isAgentic ? agenticTotalQuestions : classicQuestions.length;
   const {
     transcript,
     listening,
@@ -250,18 +272,37 @@ function Step2interview({ interviewData, onFinish }) {
     stopMic();
     setIsSubmitting(true);
     try {
-      const result = await axios.post(
-        `${serverUrl}/interview/submit-answer`,
-        {
-          interviewId,
-          questionIndex: currentIndex,
-          answer,
-          timeTaken: currentQuestion.timeLimit - timeLeft,
-        },
-        { withCredentials: true },
-      );
-      setFeedback(result.data.feedback);
-      speakText(result.data.feedback);
+      if (isAgentic) {
+        // === Agentic flow: submit answer, get next question ===
+        const result = await axios.post(
+          `${serverUrl}/interview/agentic/answer`,
+          { interviewId, answer },
+          { withCredentials: true },
+        );
+        const fb = result.data.feedback?.overall_feedback || "Answer evaluated.";
+        setFeedback(fb);
+        speakText(fb);
+
+        // Store the next question (if any) for handleNext
+        if (result.data.nextQuestion) {
+          setAgenticQuestion(result.data.nextQuestion);
+        }
+        setAgenticIsLast(result.data.isLastQuestion);
+      } else {
+        // === Classic flow ===
+        const result = await axios.post(
+          `${serverUrl}/interview/submit-answer`,
+          {
+            interviewId,
+            questionIndex: currentIndex,
+            answer,
+            timeTaken: currentQuestion.timeLimit - timeLeft,
+          },
+          { withCredentials: true },
+        );
+        setFeedback(result.data.feedback);
+        speakText(result.data.feedback);
+      }
     } catch (err) {
       console.log(err);
     }
@@ -272,15 +313,28 @@ function Step2interview({ interviewData, onFinish }) {
     setAnswer("");
     setFeedback("");
     resetTranscript();
-    if (currentIndex + 1 >= questions.length) {
-      finishInterview();
-      return;
+
+    if (isAgentic) {
+      // === Agentic: check if this was the last question ===
+      if (agenticIsLast) {
+        finishInterview();
+        return;
+      }
+      // agenticQuestion was already updated in handleSubmitAnswer
+      await speakText("Let's move to the next question.");
+      setCurrentIndex((prev) => prev + 1);
+      setTimeLeft(agenticQuestion?.timeLimit || 60);
+      setTimeout(() => { if (isMicOn) startMic(); }, 300);
+    } else {
+      // === Classic flow ===
+      if (currentIndex + 1 >= classicQuestions.length) {
+        finishInterview();
+        return;
+      }
+      await speakText("Let's move to the next question.");
+      setCurrentIndex(currentIndex + 1);
+      setTimeout(() => { if (isMicOn) startMic(); }, 300);
     }
-    await speakText("Let's move to the next question.");
-    setCurrentIndex(currentIndex + 1);
-    setTimeout(() => {
-      if (isMicOn) startMic();
-    }, 300);
   };
 
   const finishInterview = async () => {
@@ -430,7 +484,7 @@ function Step2interview({ interviewData, onFinish }) {
                   <div className="grid flex-1 grid-cols-2 gap-3">
                     {[
                       { v: currentIndex + 1, l: "Current" },
-                      { v: questions.length, l: "Total" },
+                      { v: totalQuestionsCount, l: "Total" },
                     ].map((s) => (
                       <div
                         key={s.l}

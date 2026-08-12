@@ -78,6 +78,7 @@ function Step1Setup({ onStart }) {
   const [experience, setExperience] = useState("");
   const [mode, setMode] = useState("");
   const [interviewLength, setInterviewLength] = useState("");
+  const [interviewType, setInterviewType] = useState("agentic");
   const [resumeFile, setResumeFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [extractedExperience, setExtractedExperience] = useState([]);
@@ -124,12 +125,32 @@ function Step1Setup({ onStart }) {
     if (hasInsufficientCredits) { setCreditError("Need at least 20 credits to start MockHire."); setLoading(false); return; }
     setCreditError("");
     try {
-      const result = await axios.post(`${serverUrl}/interview/generate-questions`, {
-        role: role.trim(), experience, mode, length: interviewLength, projects, skills, resumeText,
-      }, { withCredentials: true });
-      if (userData) dispatch(setUserData({ ...userData, credits: result.data.creditsLeft }));
-      setLoading(false);
-      onStart(result.data);
+      if (interviewType === "agentic") {
+        // === Agentic flow: one question at a time ===
+        const result = await axios.post(`${serverUrl}/interview/agentic/start`, {
+          role: role.trim(), experience, mode, length: interviewLength, projects, skills, resumeText,
+        }, { withCredentials: true });
+        if (userData) dispatch(setUserData({ ...userData, credits: result.data.creditsLeft }));
+        setLoading(false);
+        onStart({
+          interviewId: result.data.interviewId,
+          creditsLeft: result.data.creditsLeft,
+          userName: result.data.userName,
+          totalQuestions: result.data.totalQuestions,
+          interviewType: "agentic",
+          question: result.data.question,
+          questionIndex: result.data.questionIndex,
+          isLastQuestion: result.data.isLastQuestion,
+        });
+      } else {
+        // === Classic flow: all questions at once ===
+        const result = await axios.post(`${serverUrl}/interview/generate-questions`, {
+          role: role.trim(), experience, mode, length: interviewLength, projects, skills, resumeText,
+        }, { withCredentials: true });
+        if (userData) dispatch(setUserData({ ...userData, credits: result.data.creditsLeft }));
+        setLoading(false);
+        onStart(result.data);
+      }
     } catch (err) {
       const msg = err?.response?.data?.message || "";
       if (msg.toLowerCase().includes("credit")) setCreditError("Need at least 20 credits.");
@@ -169,6 +190,17 @@ function Step1Setup({ onStart }) {
             <motion.div variants={fadeUp}>
               <SectionLabel title="Interview Length" />
               <div className="grid gap-3 sm:grid-cols-3">{INTERVIEW_LENGTH_OPTIONS.map((o) => <OptionButton key={o} label={o} active={interviewLength === o} onClick={() => setInterviewLength(o)} />)}</div>
+            </motion.div>
+
+            <motion.div variants={fadeUp}>
+              <SectionLabel title="Interview Type" hint="Agentic = adaptive AI" />
+              <div className="flex flex-wrap gap-3">
+                <OptionButton label="⚡ Agentic" active={interviewType === "agentic"} onClick={() => setInterviewType("agentic")} />
+                <OptionButton label="Classic" active={interviewType === "classic"} onClick={() => setInterviewType("classic")} />
+              </div>
+              {interviewType === "agentic" && (
+                <p className="mt-2 text-xs text-indigo-500">Agentic mode adapts questions based on your answers in real-time.</p>
+              )}
             </motion.div>
 
             <motion.div variants={fadeUp} className="rounded-xl border border-slate-200/60 bg-gradient-to-br from-slate-50 to-indigo-50/20 p-4 sm:p-5">
